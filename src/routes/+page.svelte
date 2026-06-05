@@ -12,7 +12,8 @@
 </script>
 
 <svelte:head>
-	<title>HelmSeek</title>
+	<title>Helm Seek</title>
+	<link rel="icon" href="/favicon.ico" />
 </svelte:head>
 
 <!-- Hero widget (absolutely positioned above search) -->
