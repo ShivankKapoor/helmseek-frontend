@@ -74,6 +74,16 @@
 		return dirs[Math.round(deg / 45) % 8];
 	}
 
+	function formatUpdated(ts: string | null): string {
+		if (!ts) return '';
+		const diffMin = Math.floor((Date.now() - new Date(ts).getTime()) / 60000);
+		if (diffMin < 1) return 'just now';
+		if (diffMin < 60) return `${diffMin}m ago`;
+		const diffHr = Math.floor(diffMin / 60);
+		if (diffHr < 24) return `${diffHr}h ago`;
+		return new Date(ts).toLocaleDateString();
+	}
+
 	let cfg = $derived(configState.config);
 </script>
 
@@ -114,6 +124,12 @@
 					<div class="detail-row">
 						<i class="bi bi-{cfg.cachedIsDay ? 'sun' : 'moon'}"></i>
 						<span>{cfg.cachedIsDay ? 'Daytime' : 'Nighttime'}</span>
+					</div>
+				{/if}
+				{#if cfg.lastWeatherUpdate}
+					<div class="detail-row updated-row">
+						<i class="bi bi-clock"></i>
+						<span>Updated {formatUpdated(cfg.lastWeatherUpdate)}</span>
 					</div>
 				{/if}
 			</div>
@@ -221,6 +237,8 @@
 		width: 12px;
 		text-align: center;
 	}
+
+	.updated-row { font-size: 0.65rem; opacity: 0.7; }
 
 	.weather-loading, .weather-error, .weather-setup {
 		display: flex;
