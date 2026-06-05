@@ -152,43 +152,45 @@
 	}
 </script>
 
-<form
-	bind:this={formEl}
-	class="search-box"
-	action="https://www.google.com/search"
-	method="GET"
-	autocomplete="off"
-	novalidate
-	onsubmit={onSubmit}
->
-	<div class="search-icon">
-		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-		</svg>
-	</div>
-	<input
-		bind:this={inputEl}
-		type="text"
-		name="q"
-		placeholder="Search Google..."
-		oninput={onInput}
-		onkeydown={onKeydown}
-	/>
-	<button type="submit">Search</button>
-</form>
-
-{#if showCalculator && calcResult}
-	<div class="calculator-dropdown">
-		<div class="calculator-result">
-			<div class="calc-icon"><i class="bi bi-calculator"></i></div>
-			<div class="calc-content">
-				<div class="calc-expression">{mathExpression}</div>
-				<div class="calc-answer">= {calcResult}</div>
-			</div>
-			<div class="calc-action"><small>Press Enter to copy</small></div>
+<div class="search-wrapper">
+	<form
+		bind:this={formEl}
+		class="search-box"
+		action="https://www.google.com/search"
+		method="GET"
+		autocomplete="off"
+		novalidate
+		onsubmit={onSubmit}
+	>
+		<div class="search-icon">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg>
 		</div>
-	</div>
-{/if}
+		<input
+			bind:this={inputEl}
+			type="text"
+			name="q"
+			placeholder="Search Google..."
+			oninput={onInput}
+			onkeydown={onKeydown}
+		/>
+		<button type="submit">Search</button>
+	</form>
+
+	{#if showCalculator && calcResult}
+		<div class="calculator-dropdown">
+			<div class="calculator-result">
+				<div class="calc-icon"><i class="bi bi-calculator"></i></div>
+				<div class="calc-content">
+					<div class="calc-expression">{mathExpression}</div>
+					<div class="calc-answer">= {calcResult}</div>
+				</div>
+				<div class="calc-action"><small>Press Enter to copy</small></div>
+			</div>
+		</div>
+	{/if}
+</div>
 
 <div bind:this={emptyPopupEl} class="empty-search-popup">
 	<div class="popup-content">
@@ -205,8 +207,11 @@
 </div>
 
 <style>
-	:global(form.search-box) {
+	.search-wrapper {
 		position: relative;
+		width: 100%;
+		min-width: 45vw;
+		max-width: 700px;
 	}
 
 	.calculator-dropdown {

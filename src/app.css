@@ -30,12 +30,15 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  min-height: 100dvh; /* iOS Safari: excludes browser chrome */
   background-color: var(--bg-color);
   color: var(--text-color);
   font-family: "Fira Code", monospace;
   transition: background-color 0.3s, color 0.3s;
   padding: 20px;
   overflow: hidden;
+  /* Prevent iOS tap highlight */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .visually-hidden {
@@ -55,8 +58,6 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
-  min-width: 45vw;
-  max-width: 700px;
   border-radius: 24px;
   overflow: visible;
   background: var(--input-bg);
@@ -137,8 +138,8 @@ body {
   position: absolute;
   bottom: 20px;
   right: 76px;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 6px;
   border: none;
   background: var(--button-bg);
@@ -159,8 +160,8 @@ body {
   position: absolute;
   bottom: 20px;
   right: 20px;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 6px;
   border: none;
   background: var(--button-bg);
@@ -197,6 +198,7 @@ body {
   min-width: 400px;
   max-width: 90vw;
   max-height: 90vh;
+  max-height: 90dvh;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   color: var(--text-color);
   overflow: hidden;
@@ -236,7 +238,7 @@ body {
   padding: 20px;
   flex: 1;
   overflow-y: auto;
-  max-height: calc(90vh - 80px);
+  max-height: calc(90dvh - 80px);
   scroll-behavior: smooth;
 }
 
@@ -388,10 +390,12 @@ body {
 
 /* ── Responsive ── */
 @media (max-width: 480px) {
-  .search-box input { font-size: 16px; padding: 10px 6px 10px 0; }
+  /* Prevent iOS auto-zoom on input focus */
+  input, select, textarea { font-size: 16px !important; }
+  .search-box input { padding: 10px 6px 10px 0; }
   .search-box button[type="submit"] { font-size: 14px; padding: 0 16px; }
-  .settings-trigger { right: 66px; bottom: 10px; width: 35px; height: 35px; font-size: 18px; }
-  .account-button   { right: 10px;  bottom: 10px; width: 35px; height: 35px; font-size: 18px; }
+  .settings-trigger { right: 64px; bottom: 10px; width: 44px; height: 44px; font-size: 18px; }
+  .account-button   { right: 10px; bottom: 10px; width: 44px; height: 44px; font-size: 18px; }
   .settings-modal   { min-width: 300px; max-width: 95vw; }
   .settings-content { padding: 16px; max-height: calc(95vh - 70px); }
   .footer .desktop-footer { display: none; }

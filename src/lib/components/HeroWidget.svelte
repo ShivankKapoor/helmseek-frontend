@@ -161,4 +161,9 @@
 		.date          { font-size: 0.7rem; }
 		.hero-clock, .hero-greeting, .hero-both { gap: 4px; }
 	}
+
+	/* Hide hero widget when viewport is too short to fit it + search */
+	@media (max-height: 380px) {
+		.hero-widget { display: none; }
+	}
 </style>
