@@ -38,8 +38,6 @@
 						href={link.url}
 						class="quick-link quick-link-{corner}"
 						title={link.url}
-						target="_blank"
-						rel="noopener noreferrer"
 						onmousemove={onMouseMove}
 						onmouseleave={onMouseLeave}
 					>
