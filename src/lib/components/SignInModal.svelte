@@ -23,7 +23,7 @@
 			await login(username, password);
 			const config = await fetchConfig();
 			configState.replace(config);
-			authState.setAuthenticated();
+			authState.setAuthenticated(config.username);
 			localStorage.setItem('helm_was_authenticated', '1');
 			close();
 		} catch (e) {

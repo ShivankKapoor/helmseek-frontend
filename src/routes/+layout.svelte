@@ -39,7 +39,7 @@
 		try {
 			const config = await fetchConfig();
 			configState.replace(config);
-			authState.setAuthenticated();
+			authState.setAuthenticated(config.username);
 		} catch (e) {
 			authState.setUnauthenticated();
 		}

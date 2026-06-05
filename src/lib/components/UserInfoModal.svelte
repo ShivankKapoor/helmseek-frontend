@@ -4,7 +4,7 @@
 	import { logout } from '$lib/api/auth';
 	import { saveConfig, fetchConfig } from '$lib/api/config';
 
-	let { open = $bindable(false), username = '' }: { open: boolean; username?: string } = $props();
+	let { open = $bindable(false) }: { open: boolean } = $props();
 
 	let isSyncing = $state(false);
 	let syncMessage = $state('');
@@ -69,7 +69,7 @@
 				<div class="user-info">
 					<div class="user-avatar"><i class="bi-person-circle"></i></div>
 					<div class="user-details">
-						<div class="username">{username || 'Signed In'}</div>
+						<div class="username">{authState.username || 'Signed In'}</div>
 					</div>
 				</div>
 

@@ -8,6 +8,7 @@ export interface QuickLink {
 }
 
 export interface UserConfig {
+	username: string;
 	themeMode: 'light' | 'dark';
 	selectedColor: string;
 	heroEnabled: boolean;
@@ -38,6 +39,7 @@ export interface UserConfigDTO extends Omit<UserConfig, 'quickLinks'> {
 }
 
 export const DEFAULT_CONFIG: UserConfig = {
+	username: '',
 	themeMode: 'light',
 	selectedColor: '#1a73e8,#155ab6',
 	heroEnabled: true,
