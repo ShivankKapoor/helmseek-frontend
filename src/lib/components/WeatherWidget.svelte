@@ -69,6 +69,11 @@
 		return 'location';
 	}
 
+	function windDegToCompass(deg: number): string {
+		const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+		return dirs[Math.round(deg / 45) % 8];
+	}
+
 	let cfg = $derived(configState.config);
 </script>
 
@@ -91,6 +96,26 @@
 					<div class="temperature">{cfg.cachedTemperature}°F</div>
 					<div class={locationClass(cfg.weatherCity)}>{cfg.weatherCity}</div>
 				</div>
+			</div>
+			<div class="weather-details">
+				{#if cfg.cachedWeatherDescription}
+					<div class="detail-row">
+						<i class="bi bi-cloud"></i>
+						<span>{cfg.cachedWeatherDescription}</span>
+					</div>
+				{/if}
+				{#if cfg.cachedWindSpeed !== null}
+					<div class="detail-row">
+						<i class="bi bi-wind"></i>
+						<span>{cfg.cachedWindSpeed} mph {cfg.cachedWindDirection !== null ? windDegToCompass(cfg.cachedWindDirection!) : ''}</span>
+					</div>
+				{/if}
+				{#if cfg.cachedIsDay !== null}
+					<div class="detail-row">
+						<i class="bi bi-{cfg.cachedIsDay ? 'sun' : 'moon'}"></i>
+						<span>{cfg.cachedIsDay ? 'Daytime' : 'Nighttime'}</span>
+					</div>
+				{/if}
 			</div>
 		{:else}
 			<div class="weather-setup">
@@ -126,7 +151,6 @@
 	}
 
 	.weather-widget:hover {
-		transform: translateY(-2px);
 		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 	}
 
@@ -165,6 +189,38 @@
 	.location.long-name          { font-size: 0.65rem; max-width: 110px; }
 	.location.very-long-name     { font-size: 0.6rem;  max-width: 120px; }
 	.location.extremely-long-name{ font-size: 0.55rem; max-width: 130px; }
+
+	.weather-details {
+		max-height: 0;
+		overflow: hidden;
+		opacity: 0;
+		transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+		margin-top: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.weather-widget:hover .weather-details {
+		max-height: 100px;
+		opacity: 1;
+		margin-top: 10px;
+	}
+
+	.detail-row {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 0.72rem;
+		color: var(--footer-color);
+	}
+
+	.detail-row i {
+		font-size: 0.75rem;
+		color: var(--button-bg);
+		width: 12px;
+		text-align: center;
+	}
 
 	.weather-loading, .weather-error, .weather-setup {
 		display: flex;
