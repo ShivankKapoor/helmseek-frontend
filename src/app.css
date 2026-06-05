@@ -1,0 +1,400 @@
+:root {
+  --bg-color: #f2f2f2;
+  --text-color: #202124;
+  --input-bg: #fff;
+  --input-text: #202124;
+  --button-bg: #1a73e8;
+  --button-hover: #155ab6;
+  --button-bg-rgb: 26, 115, 232;
+  --footer-color: #70757a;
+}
+
+body.dark {
+  --bg-color: #202124;
+  --text-color: #e8eaed;
+  --input-bg: #303134;
+  --input-text: #e8eaed;
+  --footer-color: #9aa0a6;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: "Fira Code", monospace;
+  transition: background-color 0.3s, color 0.3s;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Search Box (global — used by SearchBar component) ── */
+.search-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 45vw;
+  max-width: 700px;
+  border-radius: 24px;
+  overflow: visible;
+  background: var(--input-bg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s;
+  position: relative;
+}
+
+.search-box:focus-within {
+  box-shadow: 0 0 10px var(--button-bg);
+}
+
+.search-box.shake {
+  animation: search-shake var(--shake-duration, 0.6s) ease-in-out;
+}
+
+.search-box .search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px 0 16px;
+  color: var(--input-text);
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.search-box .search-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  padding: 12px 8px 12px 0;
+  font-size: 18px;
+  outline: none;
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-family: "Fira Code", monospace;
+  transition: background 0.3s, color 0.3s;
+}
+
+.search-box input::selection {
+  background: var(--button-bg);
+  color: white;
+}
+
+.search-box:focus-within .search-icon,
+.search-box:hover .search-icon {
+  opacity: 0.8;
+}
+
+.search-box button[type="submit"] {
+  border: none;
+  background: var(--button-bg);
+  color: #fff;
+  padding: 0 32px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-family: "Fira Code", monospace;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  white-space: nowrap;
+  border-radius: 0 24px 24px 0;
+}
+
+.search-box button[type="submit"]:hover {
+  background: var(--button-hover);
+}
+
+/* ── Buttons ── */
+.settings-trigger {
+  position: absolute;
+  bottom: 20px;
+  right: 76px;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  border: none;
+  background: var(--button-bg);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: background 0.3s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 2000;
+}
+
+.settings-trigger:hover { background: var(--button-hover); }
+
+.account-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  border: none;
+  background: var(--button-bg);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: background 0.3s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 2000;
+}
+
+.account-button:hover { background: var(--button-hover); }
+
+/* ── Settings Modal ── */
+.settings-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.settings-modal {
+  background: var(--input-bg);
+  border-radius: 12px;
+  min-width: 400px;
+  max-width: 90vw;
+  max-height: 90vh;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  color: var(--text-color);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.settings-header h3 {
+  margin: 0;
+  font-family: "Fira Code", monospace;
+  font-size: 18px;
+}
+
+.settings-header .close-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.settings-header .close-btn:hover {
+  background: rgba(128, 128, 128, 0.15);
+}
+
+.settings-content {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+  max-height: calc(90vh - 80px);
+  scroll-behavior: smooth;
+}
+
+.settings-content::-webkit-scrollbar { width: 8px; }
+.settings-content::-webkit-scrollbar-track { background: rgba(128,128,128,0.1); border-radius: 4px; }
+.settings-content::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.3); border-radius: 4px; }
+
+.setting-section {
+  margin-bottom: 20px;
+}
+
+.setting-section:last-child { margin-bottom: 0; }
+
+.setting-section > label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: "Fira Code", monospace;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  font-family: "Fira Code", monospace;
+  font-size: 14px;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--button-bg);
+  color: #fff;
+  border-color: var(--button-bg);
+}
+
+.color-selector-dropdown {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-family: "Fira Code", monospace;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+
+.color-selector-dropdown:focus {
+  border-color: var(--button-bg);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+/* ── Footer ── */
+.footer {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--footer-color);
+  font-family: "Fira Code", monospace;
+  text-align: center;
+  max-width: 95vw;
+  padding: 0 10px;
+}
+
+.footer a { color: inherit; text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+.footer .mobile-footer { display: none; }
+.footer .desktop-footer { display: inline; }
+
+/* ── Empty search popup ── */
+.empty-search-popup {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.empty-search-popup .popup-content {
+  background: var(--input-bg);
+  border: 1px solid var(--button-bg);
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-color);
+  font-family: "Fira Code", monospace;
+  font-size: clamp(12px, 2.5vw, 14px);
+  white-space: nowrap;
+}
+
+.empty-search-popup .popup-content i { color: var(--button-bg); font-size: clamp(14px, 3vw, 16px); }
+
+.empty-search-popup.show {
+  opacity: 1;
+  visibility: visible;
+  animation: popup-bounce-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.empty-search-popup.hide {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+}
+
+/* ── Animations ── */
+@keyframes search-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(calc(-1 * var(--shake-intensity, 8px))); }
+  20%, 40%, 60%, 80% { transform: translateX(var(--shake-intensity, 8px)); }
+}
+
+@keyframes popup-bounce-bottom {
+  0%   { transform: translateX(-50%) translateY(20px) scale(0.9); opacity: 0; }
+  60%  { transform: translateX(-50%) translateY(-2px) scale(1.02); }
+  100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .search-box input { font-size: 16px; padding: 10px 6px 10px 0; }
+  .search-box button[type="submit"] { font-size: 14px; padding: 0 16px; }
+  .settings-trigger { right: 66px; bottom: 10px; width: 35px; height: 35px; font-size: 18px; }
+  .account-button   { right: 10px;  bottom: 10px; width: 35px; height: 35px; font-size: 18px; }
+  .settings-modal   { min-width: 300px; max-width: 95vw; }
+  .settings-content { padding: 16px; max-height: calc(95vh - 70px); }
+  .footer .desktop-footer { display: none; }
+  .footer .mobile-footer  { display: inline; }
+  .footer { font-size: 10px; bottom: 8px; }
+}
