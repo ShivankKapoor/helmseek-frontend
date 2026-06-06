@@ -3,11 +3,70 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="description" content="Your personalized browser homepage" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<title>Helm Seek</title>
+		<meta name="description" content="Helm is a powerful, customizable search dashboard with quick links, theme switching, and cloud sync. Streamline your browsing experience with personalized shortcuts and beautiful themes." />
+		<meta name="keywords" content="search, dashboard, quick links, bookmarks, productivity, customizable, themes, cloud sync" />
+		<meta name="author" content="Helm Dashboard" />
+		<meta name="robots" content="index, follow" />
+
+		<!-- Open Graph -->
+		<meta property="og:title" content="Helm Seek" />
+		<meta property="og:description" content="Helm is a powerful, customizable search dashboard with quick links, theme switching, and cloud sync. Streamline your browsing experience with personalized shortcuts and beautiful themes." />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://helmseek.com/" />
+		<meta property="og:site_name" content="Helm Dashboard" />
+		<meta property="og:locale" content="en_US" />
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Helm Seek" />
+		<meta name="twitter:description" content="A powerful, customizable search dashboard with quick links, theme switching, and cloud sync." />
+
+		<!-- PWA / Mobile -->
+		<meta name="theme-color" content="#1a73e8" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<meta name="apple-mobile-web-app-title" content="Helm Seek" />
+		<meta name="application-name" content="Helm Seek" />
+
+		<!-- Canonical -->
+		<link rel="canonical" href="https://helmseek.com/" />
+
+		<link rel="icon" href="%sveltekit.assets%/favicon.ico" />
+<link rel="manifest" href="%sveltekit.assets%/manifest.json" />
+
+		<!-- Preconnect -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://www.google.com" />
+		<link rel="dns-prefetch" href="https://www.google.com" />
+
 		<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+		<!-- JSON-LD -->
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebApplication",
+			"name": "Helm Dashboard",
+			"description": "A powerful, customizable search dashboard with quick links, theme switching, and cloud sync",
+			"url": "https://helmseek.com",
+			"applicationCategory": "ProductivityApplication",
+			"operatingSystem": "Web Browser",
+			"browserRequirements": "Requires JavaScript",
+			"author": {
+				"@type": "Organization",
+				"name": "Helm Dashboard"
+			},
+			"offers": {
+				"@type": "Offer",
+				"price": "0",
+				"priceCurrency": "USD"
+			}
+		}
+		</script>
+
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
