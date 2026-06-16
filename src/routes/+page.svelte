@@ -38,7 +38,7 @@
 	aria-label="Account"
 	onclick={() => { accountOpen = true; }}
 >
-	<i class={authState.authenticated ? 'bi-person-check-fill' : 'bi-person-circle'} aria-hidden="true"></i>
+	<i class={authState.checking ? 'bi-arrow-clockwise spin' : authState.authenticated ? 'bi-person-check-fill' : 'bi-person-circle'} aria-hidden="true"></i>
 </button>
 
 <!-- Quick links (fixed corners) -->
