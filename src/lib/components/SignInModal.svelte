@@ -19,18 +19,26 @@
 		if (!username || !password || isLoading) return;
 		isLoading = true;
 		errorMessage = '';
+		let loginSucceeded = false;
 		try {
 			await login(username, password);
+			loginSucceeded = true;
 			const config = await fetchConfig();
 			configState.replace(config);
 			authState.setAuthenticated(config.username);
 			localStorage.setItem('helm_was_authenticated', '1');
 			close();
 		} catch (e) {
-			if (e instanceof ApiError && e.status === 401) {
-				errorMessage = 'Invalid username or password.';
+			if (!loginSucceeded) {
+				if (e instanceof ApiError && e.status === 401) {
+					errorMessage = 'Invalid username or password.';
+				} else {
+					errorMessage = 'Something went wrong. Please try again.';
+				}
 			} else {
-				errorMessage = 'Something went wrong. Please try again.';
+				localStorage.setItem('helm_was_authenticated', '1');
+				authState.setAuthenticated('');
+				close();
 			}
 		} finally {
 			isLoading = false;

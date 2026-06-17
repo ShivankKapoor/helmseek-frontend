@@ -28,7 +28,7 @@ export async function apiFetch<T = void>(path: string, init?: RequestInit): Prom
 
 	if (!res.ok) throw new ApiError(res.status, res.statusText);
 
-	const contentLength = res.headers.get('content-length');
-	const hasBody = res.status !== 204 && contentLength !== '0';
+	const contentType = res.headers.get('content-type') ?? '';
+	const hasBody = res.status !== 204 && contentType.includes('application/json');
 	return hasBody ? res.json() : (undefined as T);
 }
