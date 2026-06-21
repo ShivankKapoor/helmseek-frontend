@@ -8,6 +8,23 @@
 	import { COLOR_OPTIONS, FONT_OPTIONS, type QuickLink } from '$lib/types/config';
 
 	let isOpen = $state(false);
+	let fontDropdownOpen = $state(false);
+	let allFontsLoaded = $state(false);
+
+	function loadAllFonts() {
+		if (allFontsLoaded) return;
+		const families = FONT_OPTIONS.map((f) => `family=${f.name.replace(/ /g, '+')}`).join('&');
+		const url = `https://fonts.googleapis.com/css2?${families}&display=swap`;
+		let link = document.getElementById('google-fonts-all') as HTMLLinkElement | null;
+		if (!link) {
+			link = document.createElement('link');
+			link.id = 'google-fonts-all';
+			link.rel = 'stylesheet';
+			document.head.appendChild(link);
+		}
+		link.href = url;
+		allFontsLoaded = true;
+	}
 
 	// Weather
 	let zipInput = $state('');
@@ -42,8 +59,13 @@
 		if (authState.authenticated) saveConfig(configState.config);
 	}
 
-	function openSettings() { isOpen = true; zipInput = cfg('weatherZip'); }
-	function closeSettings() { isOpen = false; }
+	function openSettings() { isOpen = true; zipInput = cfg('weatherZip'); loadAllFonts(); }
+	function closeSettings() { isOpen = false; fontDropdownOpen = false; }
+
+	function handleBackdropClick(e: MouseEvent) {
+		if (fontDropdownOpen) { fontDropdownOpen = false; e.stopPropagation(); return; }
+		closeSettings();
+	}
 
 	async function saveLocation() {
 		if (!zipInput.trim()) return;
@@ -142,7 +164,7 @@
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div class="settings-backdrop" onclick={closeSettings} onkeydown={(e) => e.key === 'Escape' && closeSettings()}>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div class="settings-modal" onclick={(e) => e.stopPropagation()}>
+		<div class="settings-modal" onclick={(e) => { e.stopPropagation(); if (fontDropdownOpen) fontDropdownOpen = false; }}>
 			<div class="settings-header">
 				<h3>Settings</h3>
 				<button class="close-btn" onclick={closeSettings}><i class="bi bi-x-lg"></i></button>
@@ -176,15 +198,32 @@
 				<!-- Font -->
 				<div class="setting-section">
 					<label>Font</label>
-					<select
-						class="color-selector-dropdown"
-						value={cfg('fontFamily')}
-						onchange={(e) => update({ fontFamily: e.currentTarget.value })}
-					>
-						{#each FONT_OPTIONS as opt}
-							<option value={opt.name}>{opt.name}</option>
-						{/each}
-					</select>
+					<div class="font-dropdown" class:open={fontDropdownOpen} onclick={(e) => e.stopPropagation()}>
+						<button
+							type="button"
+							class="font-dropdown-trigger"
+							onclick={() => (fontDropdownOpen = !fontDropdownOpen)}
+							style="font-family: '{cfg('fontFamily')}', sans-serif"
+						>
+							{cfg('fontFamily')}
+							<i class="bi bi-chevron-down font-chevron"></i>
+						</button>
+						{#if fontDropdownOpen}
+							<ul class="font-dropdown-list">
+								{#each FONT_OPTIONS as opt}
+									<li>
+										<button
+											type="button"
+											class="font-dropdown-option"
+											class:selected={cfg('fontFamily') === opt.name}
+											style="font-family: '{opt.name}', {opt.fallback}"
+											onclick={() => { update({ fontFamily: opt.name }); fontDropdownOpen = false; }}
+										>{opt.name}</button>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+					</div>
 				</div>
 
 				<!-- Hero Widget -->
@@ -812,4 +851,71 @@
 
 	.btn-primary:hover:not(:disabled) { background: var(--button-hover); }
 	.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+	.font-dropdown { position: relative; width: 100%; }
+
+	.font-dropdown-trigger {
+		width: 100%;
+		padding: 10px 12px;
+		border: 1px solid rgba(128, 128, 128, 0.3);
+		border-radius: 6px;
+		background: var(--input-bg);
+		color: var(--text-color);
+		font-size: 14px;
+		cursor: pointer;
+		outline: none;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		text-align: left;
+	}
+
+	.font-dropdown-trigger:focus,
+	.font-dropdown.open .font-dropdown-trigger {
+		border-color: var(--button-bg);
+		box-shadow: 0 0 0 2px rgba(var(--button-bg-rgb), 0.2);
+	}
+
+	.font-chevron {
+		font-size: 11px;
+		opacity: 0.6;
+		transition: transform 0.15s;
+	}
+
+	.font-dropdown.open .font-chevron { transform: rotate(180deg); }
+
+	.font-dropdown-list {
+		position: absolute;
+		top: calc(100% + 4px);
+		left: 0;
+		right: 0;
+		background: var(--input-bg);
+		border: 1px solid rgba(128, 128, 128, 0.3);
+		border-radius: 6px;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+		z-index: 100;
+		list-style: none;
+		max-height: 220px;
+		overflow-y: auto;
+		padding: 4px 0;
+	}
+
+	.font-dropdown-list::-webkit-scrollbar { width: 6px; }
+	.font-dropdown-list::-webkit-scrollbar-track { background: transparent; }
+	.font-dropdown-list::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.3); border-radius: 3px; }
+
+	.font-dropdown-option {
+		width: 100%;
+		padding: 9px 12px;
+		border: none;
+		background: none;
+		color: var(--text-color);
+		font-size: 14px;
+		cursor: pointer;
+		text-align: left;
+		display: block;
+	}
+
+	.font-dropdown-option:hover { background: rgba(128, 128, 128, 0.12); }
+	.font-dropdown-option.selected { color: var(--button-bg); font-weight: 600; }
 </style>
