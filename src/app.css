@@ -7,6 +7,7 @@
   --button-hover: #155ab6;
   --button-bg-rgb: 26, 115, 232;
   --footer-color: #70757a;
+  --font-family: "Fira Code", monospace;
 }
 
 body.dark {
@@ -33,7 +34,7 @@ body {
   min-height: 100dvh; /* iOS Safari: excludes browser chrome */
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: "Fira Code", monospace;
+  font-family: var(--font-family);
   transition: background-color 0.3s, color 0.3s;
   padding: 20px;
   overflow: hidden;
@@ -97,7 +98,7 @@ body {
   outline: none;
   background: var(--input-bg);
   color: var(--input-text);
-  font-family: "Fira Code", monospace;
+  font-family: var(--font-family);
   transition: background 0.3s, color 0.3s;
 }
 
@@ -119,7 +120,7 @@ body {
   font-size: 16px;
   cursor: pointer;
   transition: background 0.3s;
-  font-family: "Fira Code", monospace;
+  font-family: var(--font-family);
   text-align: center;
   display: flex;
   align-items: center;
@@ -219,7 +220,7 @@ body {
 
 .settings-header h3 {
   margin: 0;
-  font-family: "Fira Code", monospace;
+  font-family: var(--font-family);
   font-size: 18px;
 }
 
@@ -258,7 +259,7 @@ body {
 .setting-section > label {
   display: block;
   margin-bottom: 8px;
-  font-family: "Fira Code", monospace;
+  font-family: var(--font-family);
   font-size: 14px;
   font-weight: 500;
 }
@@ -274,7 +275,7 @@ body {
   background: var(--input-bg);
   color: var(--text-color);
   cursor: pointer;
-  font-family: "Fira Code", monospace;
+  font-family: var(--font-family);
   font-size: 14px;
   transition: background 0.3s, border-color 0.3s;
 }
@@ -292,7 +293,7 @@ body {
   border-radius: 6px;
   background: var(--input-bg);
   color: var(--text-color);
-  font-family: "Fira Code", monospace;
+  font-family: var(--font-family);
   font-size: 14px;
   cursor: pointer;
   outline: none;
@@ -311,7 +312,7 @@ body {
   transform: translateX(-50%);
   font-size: 12px;
   color: var(--footer-color);
-  font-family: "Fira Code", monospace;
+  font-family: var(--font-family);
   text-align: center;
   max-width: 95vw;
   padding: 0 10px;
@@ -345,7 +346,7 @@ body {
   align-items: center;
   gap: 8px;
   color: var(--text-color);
-  font-family: "Fira Code", monospace;
+  font-family: var(--font-family);
   font-size: clamp(12px, 2.5vw, 14px);
   white-space: nowrap;
 }

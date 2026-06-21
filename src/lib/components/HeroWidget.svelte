@@ -70,7 +70,7 @@
 		z-index: 500;
 		text-align: center;
 		color: var(--text-color);
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		user-select: none;
 		pointer-events: none;
 		opacity: 0.9;

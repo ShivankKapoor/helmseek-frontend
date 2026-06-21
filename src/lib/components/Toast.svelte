@@ -50,7 +50,7 @@
 		align-items: center;
 		gap: 8px;
 		color: var(--text-color);
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-size: clamp(12px, 2.5vw, 14px);
 		white-space: nowrap;
 	}

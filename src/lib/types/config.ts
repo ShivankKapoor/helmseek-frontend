@@ -11,6 +11,7 @@ export interface UserConfig {
 	username: string;
 	themeMode: 'light' | 'dark';
 	selectedColor: string;
+	fontFamily: string;
 	heroEnabled: boolean;
 	heroMode: 'greeting' | 'clock' | 'both' | 'none';
 	heroClockFormat: '12h' | '24h';
@@ -42,6 +43,7 @@ export const DEFAULT_CONFIG: UserConfig = {
 	username: '',
 	themeMode: 'light',
 	selectedColor: '#1a73e8,#155ab6',
+	fontFamily: 'Fira Code',
 	heroEnabled: true,
 	heroMode: 'greeting',
 	heroClockFormat: '12h',
@@ -63,6 +65,21 @@ export const DEFAULT_CONFIG: UserConfig = {
 	cachedIsDay: null,
 	lastWeatherUpdate: null
 };
+
+export const FONT_OPTIONS = [
+	{ name: 'Arimo',            fallback: 'sans-serif' },
+	{ name: 'Cascadia Code',    fallback: 'monospace'  },
+	{ name: 'Fira Code',        fallback: 'monospace'  },
+	{ name: 'IBM Plex Mono',    fallback: 'monospace'  },
+	{ name: 'Inter',            fallback: 'sans-serif' },
+	{ name: 'JetBrains Mono',   fallback: 'monospace'  },
+	{ name: 'Nunito',           fallback: 'sans-serif' },
+	{ name: 'Roboto',           fallback: 'sans-serif' },
+	{ name: 'Roboto Mono',      fallback: 'monospace'  },
+	{ name: 'Source Code Pro',  fallback: 'monospace'  },
+	{ name: 'Space Mono',       fallback: 'monospace'  },
+	{ name: 'Ubuntu Mono',      fallback: 'monospace'  },
+] as const;
 
 export const COLOR_OPTIONS = [
 	{ name: 'Blue',   value: '#1a73e8,#155ab6' },

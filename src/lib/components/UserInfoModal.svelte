@@ -217,7 +217,7 @@
 		color: var(--text-color);
 		cursor: pointer;
 		font-size: 13px;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		transition: all 0.2s ease;
 		justify-content: center;
 		font-weight: 500;
@@ -245,7 +245,7 @@
 		border-radius: 8px;
 		font-size: 14px;
 		font-weight: 500;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		cursor: pointer;
 		display: flex;
 		align-items: center;

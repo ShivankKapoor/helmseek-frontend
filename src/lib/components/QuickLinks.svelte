@@ -71,7 +71,7 @@
 		text-decoration: none;
 		font-size: 15px;
 		font-weight: 400;
-		font-family: 'Fira Code', 'SF Mono', Monaco, monospace;
+		font-family: var(--font-family);
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		border-radius: 6px;
 		display: block;

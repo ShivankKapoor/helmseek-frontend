@@ -7,17 +7,31 @@
 	import { fetchConfig } from '$lib/api/config';
 	import { ApiError, setUnauthorizedHandler } from '$lib/api/client';
 	import { hexToRgb } from '$lib/utils/colors';
+	import { FONT_OPTIONS } from '$lib/types/config';
 	import Toast from '$lib/components/Toast.svelte';
 
 	let { children } = $props();
 
-	// Apply theme class and color CSS vars whenever config changes
+	// Apply theme, color, and font CSS vars whenever config changes
 	$effect(() => {
 		const [primary, secondary] = configState.config.selectedColor.split(',');
 		document.documentElement.style.setProperty('--button-bg', primary);
 		document.documentElement.style.setProperty('--button-hover', secondary ?? primary);
 		document.documentElement.style.setProperty('--button-bg-rgb', hexToRgb(primary));
 		document.body.classList.toggle('dark', configState.config.themeMode === 'dark');
+
+		const match = FONT_OPTIONS.find((f) => f.name === (configState.config.fontFamily ?? 'Fira Code'));
+		const font = match?.name ?? 'Fira Code';
+		const fallback = match?.fallback ?? 'monospace';
+		let link = document.getElementById('google-fonts') as HTMLLinkElement | null;
+		if (!link) {
+			link = document.createElement('link');
+			link.id = 'google-fonts';
+			link.rel = 'stylesheet';
+			document.head.appendChild(link);
+		}
+		link.href = `https://fonts.googleapis.com/css2?family=${font.replace(/ /g, '+')}:wght@400;500;600&display=swap`;
+		document.documentElement.style.setProperty('--font-family', `"${font}", ${fallback}`);
 	});
 
 	onMount(() => {

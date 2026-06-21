@@ -5,7 +5,7 @@
 	import { saveWeatherCache } from '$lib/api/config';
 	import { geocodeZip, fetchWeather } from '$lib/api/weather';
 	import { logout } from '$lib/api/auth';
-	import { COLOR_OPTIONS, type QuickLink } from '$lib/types/config';
+	import { COLOR_OPTIONS, FONT_OPTIONS, type QuickLink } from '$lib/types/config';
 
 	let isOpen = $state(false);
 
@@ -169,6 +169,20 @@
 					>
 						{#each COLOR_OPTIONS as opt}
 							<option value={opt.value}>{opt.name}</option>
+						{/each}
+					</select>
+				</div>
+
+				<!-- Font -->
+				<div class="setting-section">
+					<label>Font</label>
+					<select
+						class="color-selector-dropdown"
+						value={cfg('fontFamily')}
+						onchange={(e) => update({ fontFamily: e.currentTarget.value })}
+					>
+						{#each FONT_OPTIONS as opt}
+							<option value={opt.name}>{opt.name}</option>
 						{/each}
 					</select>
 				</div>
@@ -461,7 +475,7 @@
 		border-radius: 6px;
 		background: var(--bg-color);
 		color: var(--text-color);
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-size: 13px;
 		outline: none;
 		transition: border-color 0.2s;
@@ -484,7 +498,7 @@
 		border: none;
 		border-radius: 6px;
 		cursor: pointer;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-size: 13px;
 		white-space: nowrap;
 		transition: background 0.2s;
@@ -519,7 +533,7 @@
 		transition: all 0.2s ease;
 		font-size: 0.8rem;
 		color: var(--text-color);
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 	}
 
 	.weather-position-btn:hover { border-color: var(--button-bg); background: var(--input-bg); }
@@ -537,7 +551,7 @@
 		color: var(--footer-color);
 		font-size: 0.8rem;
 		opacity: 0.6;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 	}
 
 	.weather-reserved-position small { font-size: 0.7rem; }
@@ -591,7 +605,7 @@
 		cursor: pointer;
 		color: var(--footer-color);
 		font-size: 0.9rem;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		transition: all 0.2s ease;
 	}
 
@@ -626,7 +640,7 @@
 		color: var(--text-color);
 		cursor: pointer;
 		font-size: 0.9rem;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		transition: all 0.2s ease;
 		min-width: 140px;
 		justify-content: center;
@@ -652,7 +666,7 @@
 		color: white;
 		cursor: pointer;
 		font-size: 0.9rem;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		transition: all 0.2s ease;
 		min-width: 120px;
 		justify-content: center;
@@ -714,7 +728,7 @@
 		font-size: 0.9rem;
 		background: var(--bg-color);
 		color: var(--text-color);
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		outline: none;
 		transition: border-color 0.2s;
 	}
@@ -737,7 +751,7 @@
 		transition: all 0.2s ease;
 		font-size: 0.8rem;
 		color: var(--text-color);
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 	}
 
 	.position-btn:hover { border-color: var(--button-bg); }
@@ -755,7 +769,7 @@
 		color: var(--footer-color);
 		font-size: 0.8rem;
 		opacity: 0.6;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 	}
 
 	.reserved-position small { font-size: 0.7rem; }
@@ -777,7 +791,7 @@
 		background: transparent;
 		border: 1px solid rgba(128,128,128,0.3);
 		color: var(--text-color);
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		transition: all 0.2s ease;
 	}
 
@@ -792,7 +806,7 @@
 		background: var(--button-bg);
 		border: 1px solid var(--button-bg);
 		color: white;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		transition: all 0.2s ease;
 	}
 
