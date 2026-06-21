@@ -12,7 +12,11 @@ function createConfigState() {
 		const raw = localStorage.getItem(STORAGE_KEY);
 		if (!raw) return;
 		try {
-			config = { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
+			const parsed = JSON.parse(raw);
+			const clean = Object.fromEntries(
+				Object.entries(parsed).filter(([, v]) => v !== null && v !== undefined)
+			);
+			config = { ...DEFAULT_CONFIG, ...clean };
 		} catch { /* corrupt storage — use defaults */ }
 	}
 

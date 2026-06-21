@@ -244,13 +244,13 @@
 	.calc-content { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 
 	.calc-expression {
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-size: 14px;
 		color: var(--footer-color);
 	}
 
 	.calc-answer {
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-size: 18px;
 		font-weight: 600;
 		color: var(--text-color);
@@ -259,7 +259,7 @@
 	.calc-action {
 		color: var(--footer-color);
 		font-size: 12px;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 	}
 
 	.copy-success-popup {
@@ -303,7 +303,7 @@
 		display: flex;
 		align-items: center;
 		gap: 12px;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-weight: 500;
 	}
 

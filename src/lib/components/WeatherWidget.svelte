@@ -150,7 +150,7 @@
 		border: 1px solid rgba(0, 0, 0, 0.1);
 		border-radius: 12px;
 		padding: 12px 16px;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		color: var(--text-color);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 		backdrop-filter: blur(10px);

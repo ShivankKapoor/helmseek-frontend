@@ -145,7 +145,7 @@
 
 	.signin-header h3 {
 		margin: 0;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-size: 20px;
 		font-weight: 600;
 	}
@@ -178,7 +178,7 @@
 	.form-group label {
 		display: block;
 		margin-bottom: 8px;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-size: 14px;
 		font-weight: 500;
 		color: var(--text-color);
@@ -191,7 +191,7 @@
 		border-radius: 8px;
 		background: var(--input-bg);
 		color: var(--input-text);
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-size: 14px;
 		transition: border-color 0.3s, box-shadow 0.3s;
 		box-sizing: border-box;
@@ -235,7 +235,7 @@
 		border-radius: 8px;
 		background: var(--button-bg);
 		color: #fff;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-size: 16px;
 		font-weight: 500;
 		cursor: pointer;
@@ -266,7 +266,7 @@
 		border-radius: 6px;
 		color: #ea4335;
 		font-size: 14px;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		text-align: center;
 		word-wrap: break-word;
 	}
@@ -280,7 +280,7 @@
 
 	.signin-footer p {
 		margin: 8px 0;
-		font-family: "Fira Code", monospace;
+		font-family: var(--font-family);
 		font-size: 14px;
 		color: var(--footer-color);
 	}
