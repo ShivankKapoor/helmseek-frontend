@@ -497,7 +497,44 @@
 		font-size: 14px;
 	}
 
-	.toggle-row input[type="checkbox"] { margin: 0; }
+	.toggle-row input[type="checkbox"] {
+		appearance: none;
+		-webkit-appearance: none;
+		margin: 0;
+		width: 18px;
+		height: 18px;
+		border-radius: 50%;
+		border: 2px solid rgba(128, 128, 128, 0.4);
+		background: var(--bg-color);
+		cursor: pointer;
+		position: relative;
+		flex-shrink: 0;
+		transition: border-color 0.2s ease, background 0.2s ease;
+	}
+
+	.toggle-row input[type="checkbox"]:hover { border-color: var(--button-bg); }
+
+	.toggle-row input[type="checkbox"]:checked {
+		background: var(--button-bg);
+		border-color: var(--button-bg);
+	}
+
+	.toggle-row input[type="checkbox"]:checked::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		margin: auto;
+		width: 4px;
+		height: 8px;
+		border: solid #fff;
+		border-width: 0 2px 2px 0;
+		transform: translateY(-1px) rotate(45deg);
+	}
+
+	.toggle-row input[type="checkbox"]:focus-visible {
+		outline: 2px solid var(--button-bg);
+		outline-offset: 2px;
+	}
 
 	.hero-widget-manager, .weather-widget-manager, .quick-links-manager, .quote-widget-manager, .sync-manager, .account-manager {
 		display: flex;
