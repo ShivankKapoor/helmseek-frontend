@@ -1,6 +1,7 @@
 <script lang="ts">
 	import HeroWidget from '$lib/components/HeroWidget.svelte';
 	import SearchBar from '$lib/components/SearchBar.svelte';
+	import QuoteWidget from '$lib/components/QuoteWidget.svelte';
 	import WeatherWidget from '$lib/components/WeatherWidget.svelte';
 	import QuickLinks from '$lib/components/QuickLinks.svelte';
 	import Settings from '$lib/components/Settings.svelte';
@@ -26,6 +27,8 @@
 <main role="main">
 	<h1 class="visually-hidden">Helm Seek - Advanced Search Dashboard</h1>
 	<SearchBar />
+	<!-- Quote of the Day (absolutely positioned below search bar, doesn't affect layout height) -->
+	<QuoteWidget />
 </main>
 
 <!-- Settings (renders its own trigger button + modal) -->

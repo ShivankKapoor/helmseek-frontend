@@ -25,6 +25,7 @@ export interface UserConfig {
 	weatherLng: number;
 	quickLinksEnabled: boolean;
 	quickLinks: QuickLink[];
+	motdEnabled: boolean;
 	cachedTemperature: number | null;
 	cachedWeatherCode: number | null;
 	cachedWindDirection: number | null;
@@ -57,6 +58,7 @@ export const DEFAULT_CONFIG: UserConfig = {
 	weatherLng: 0,
 	quickLinksEnabled: false,
 	quickLinks: [],
+	motdEnabled: false,
 	cachedTemperature: null,
 	cachedWeatherCode: null,
 	cachedWindDirection: null,

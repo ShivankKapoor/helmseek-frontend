@@ -387,6 +387,18 @@
 					</div>
 				</div>
 
+				<!-- Quote of the Day -->
+				<div class="setting-section">
+					<label>Quote of the Day</label>
+					<div class="quote-widget-manager">
+						<label class="toggle-row">
+							<input type="checkbox" checked={cfg('motdEnabled')}
+								onchange={(e) => update({ motdEnabled: e.currentTarget.checked })} />
+							<span>Enable Quote of the Day</span>
+						</label>
+					</div>
+				</div>
+
 				<!-- Sync + Logout (authenticated only) -->
 				{#if authState.authenticated}
 					<div class="setting-section">
@@ -487,7 +499,7 @@
 
 	.toggle-row input[type="checkbox"] { margin: 0; }
 
-	.hero-widget-manager, .weather-widget-manager, .quick-links-manager, .sync-manager, .account-manager {
+	.hero-widget-manager, .weather-widget-manager, .quick-links-manager, .quote-widget-manager, .sync-manager, .account-manager {
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
