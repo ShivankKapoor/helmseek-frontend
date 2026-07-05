@@ -9,6 +9,7 @@
 	import { hexToRgb } from '$lib/utils/colors';
 	import { FONT_OPTIONS } from '$lib/types/config';
 	import Toast from '$lib/components/Toast.svelte';
+	import AppContextMenu from '$lib/components/AppContextMenu.svelte';
 
 	let { children } = $props();
 
@@ -62,3 +63,4 @@
 
 {@render children()}
 <Toast />
+<AppContextMenu />

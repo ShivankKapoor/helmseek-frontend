@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { configState } from '$lib/state/config.svelte';
 	import { authState } from '$lib/state/auth.svelte';
+	import { settingsUiState } from '$lib/state/settings.svelte';
 	import { saveConfig } from '$lib/api/config';
 	import { saveWeatherCache } from '$lib/api/config';
 	import { geocodeZip, fetchWeather } from '$lib/api/weather';
+	import { hideQuote, unhideQuote } from '$lib/api/quote';
 	import { logout } from '$lib/api/auth';
 	import { COLOR_OPTIONS, FONT_OPTIONS, type QuickLink } from '$lib/types/config';
 
-	let isOpen = $state(false);
 	let fontDropdownOpen = $state(false);
 	let allFontsLoaded = $state(false);
 
@@ -59,8 +60,20 @@
 		if (authState.authenticated) saveConfig(configState.config);
 	}
 
-	function openSettings() { isOpen = true; zipInput = cfg('weatherZip'); loadAllFonts(); }
-	function closeSettings() { isOpen = false; fontDropdownOpen = false; }
+	// hideQuote is excluded from the general config save (POST /user/config ignores it),
+	// so toggling it has to go through its own dedicated endpoint instead of update().
+	async function toggleHideQuote(e: Event) {
+		const hidden = (e.currentTarget as HTMLInputElement).checked;
+		configState.update({ hideQuote: hidden });
+		try {
+			if (hidden) await hideQuote(); else await unhideQuote();
+		} catch {
+			// best effort — local state still reflects the user's choice
+		}
+	}
+
+	function openSettings() { settingsUiState.show(); zipInput = cfg('weatherZip'); loadAllFonts(); }
+	function closeSettings() { settingsUiState.hide(); fontDropdownOpen = false; }
 
 	function handleBackdropClick(e: MouseEvent) {
 		if (fontDropdownOpen) { fontDropdownOpen = false; e.stopPropagation(); return; }
@@ -160,7 +173,7 @@
 </button>
 
 <!-- Settings modal -->
-{#if isOpen}
+{#if settingsUiState.open}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div class="settings-backdrop" onclick={closeSettings} onkeydown={(e) => e.key === 'Escape' && closeSettings()}>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -387,6 +400,24 @@
 					</div>
 				</div>
 
+				<!-- Quote of the Day (authenticated only — the endpoint requires a session) -->
+				{#if authState.authenticated}
+					<div class="setting-section">
+						<label>Quote of the Day</label>
+						<div class="quote-widget-manager">
+							<label class="toggle-row">
+								<input type="checkbox" checked={cfg('motdEnabled')}
+									onchange={(e) => update({ motdEnabled: e.currentTarget.checked })} />
+								<span>Enable Quote of the Day</span>
+							</label>
+							<label class="toggle-row">
+								<input type="checkbox" checked={cfg('hideQuote')} onchange={toggleHideQuote} />
+								<span>Hide today's quote</span>
+							</label>
+						</div>
+					</div>
+				{/if}
+
 				<!-- Sync + Logout (authenticated only) -->
 				{#if authState.authenticated}
 					<div class="setting-section">
@@ -485,9 +516,46 @@
 		font-size: 14px;
 	}
 
-	.toggle-row input[type="checkbox"] { margin: 0; }
+	.toggle-row input[type="checkbox"] {
+		appearance: none;
+		-webkit-appearance: none;
+		margin: 0;
+		width: 18px;
+		height: 18px;
+		border-radius: 50%;
+		border: 2px solid rgba(128, 128, 128, 0.4);
+		background: var(--bg-color);
+		cursor: pointer;
+		position: relative;
+		flex-shrink: 0;
+		transition: border-color 0.2s ease, background 0.2s ease;
+	}
 
-	.hero-widget-manager, .weather-widget-manager, .quick-links-manager, .sync-manager, .account-manager {
+	.toggle-row input[type="checkbox"]:hover { border-color: var(--button-bg); }
+
+	.toggle-row input[type="checkbox"]:checked {
+		background: var(--button-bg);
+		border-color: var(--button-bg);
+	}
+
+	.toggle-row input[type="checkbox"]:checked::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		margin: auto;
+		width: 4px;
+		height: 8px;
+		border: solid #fff;
+		border-width: 0 2px 2px 0;
+		transform: translateY(-1px) rotate(45deg);
+	}
+
+	.toggle-row input[type="checkbox"]:focus-visible {
+		outline: 2px solid var(--button-bg);
+		outline-offset: 2px;
+	}
+
+	.hero-widget-manager, .weather-widget-manager, .quick-links-manager, .quote-widget-manager, .sync-manager, .account-manager {
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
