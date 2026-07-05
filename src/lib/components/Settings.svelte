@@ -387,17 +387,19 @@
 					</div>
 				</div>
 
-				<!-- Quote of the Day -->
-				<div class="setting-section">
-					<label>Quote of the Day</label>
-					<div class="quote-widget-manager">
-						<label class="toggle-row">
-							<input type="checkbox" checked={cfg('motdEnabled')}
-								onchange={(e) => update({ motdEnabled: e.currentTarget.checked })} />
-							<span>Enable Quote of the Day</span>
-						</label>
+				<!-- Quote of the Day (authenticated only — the endpoint requires a session) -->
+				{#if authState.authenticated}
+					<div class="setting-section">
+						<label>Quote of the Day</label>
+						<div class="quote-widget-manager">
+							<label class="toggle-row">
+								<input type="checkbox" checked={cfg('motdEnabled')}
+									onchange={(e) => update({ motdEnabled: e.currentTarget.checked })} />
+								<span>Enable Quote of the Day</span>
+							</label>
+						</div>
 					</div>
-				</div>
+				{/if}
 
 				<!-- Sync + Logout (authenticated only) -->
 				{#if authState.authenticated}
