@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { configState } from '$lib/state/config.svelte';
 	import { authState } from '$lib/state/auth.svelte';
+	import { settingsUiState } from '$lib/state/settings.svelte';
 	import { saveConfig } from '$lib/api/config';
 	import { saveWeatherCache } from '$lib/api/config';
 	import { geocodeZip, fetchWeather } from '$lib/api/weather';
 	import { logout } from '$lib/api/auth';
 	import { COLOR_OPTIONS, FONT_OPTIONS, type QuickLink } from '$lib/types/config';
 
-	let isOpen = $state(false);
 	let fontDropdownOpen = $state(false);
 	let allFontsLoaded = $state(false);
 
@@ -59,8 +59,8 @@
 		if (authState.authenticated) saveConfig(configState.config);
 	}
 
-	function openSettings() { isOpen = true; zipInput = cfg('weatherZip'); loadAllFonts(); }
-	function closeSettings() { isOpen = false; fontDropdownOpen = false; }
+	function openSettings() { settingsUiState.show(); zipInput = cfg('weatherZip'); loadAllFonts(); }
+	function closeSettings() { settingsUiState.hide(); fontDropdownOpen = false; }
 
 	function handleBackdropClick(e: MouseEvent) {
 		if (fontDropdownOpen) { fontDropdownOpen = false; e.stopPropagation(); return; }
@@ -160,7 +160,7 @@
 </button>
 
 <!-- Settings modal -->
-{#if isOpen}
+{#if settingsUiState.open}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div class="settings-backdrop" onclick={closeSettings} onkeydown={(e) => e.key === 'Escape' && closeSettings()}>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
