@@ -47,6 +47,17 @@
 		padding: 4px 0;
 		min-width: 160px;
 		font-family: var(--font-family);
+		transform-origin: top left;
+		animation: context-menu-in 0.12s ease-out;
+	}
+
+	@keyframes context-menu-in {
+		from { opacity: 0; transform: scale(0.92); }
+		to   { opacity: 1; transform: scale(1); }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.app-context-menu { animation: none; }
 	}
 
 	.app-context-menu-item {
