@@ -10,11 +10,12 @@
 
 	let trigger = $derived({
 		enabled: configState.config.motdEnabled,
-		authenticated: authState.authenticated
+		authenticated: authState.authenticated,
+		hidden: configState.config.hideQuote
 	});
 
 	$effect(() => {
-		if (trigger.enabled && trigger.authenticated) {
+		if (trigger.enabled && trigger.authenticated && !trigger.hidden) {
 			loadQuote();
 		}
 	});
@@ -38,8 +39,8 @@
 	}
 </script>
 
-{#if configState.config.motdEnabled && authState.authenticated && !loading && !error && quote}
-	<div class="quote-widget">
+{#if configState.config.motdEnabled && authState.authenticated && !configState.config.hideQuote && !loading && !error && quote}
+	<div class="quote-widget" data-context-menu="quote">
 		<span class="quote-text">&ldquo;{quote}&rdquo;</span>
 		<span class="quote-author">— {author}</span>
 	</div>
@@ -61,7 +62,6 @@
 		font-size: 0.95rem;
 		line-height: 1.4;
 		user-select: none;
-		pointer-events: none;
 	}
 
 	.quote-text { display: block; }

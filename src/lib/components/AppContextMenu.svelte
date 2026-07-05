@@ -1,34 +1,56 @@
 <script lang="ts">
 	import { settingsUiState } from '$lib/state/settings.svelte';
+	import { configState } from '$lib/state/config.svelte';
+	import { hideQuote } from '$lib/api/quote';
 
 	const MENU_WIDTH = 180;
 	const MENU_HEIGHT = 44;
 
 	let menuPos = $state<{ x: number; y: number } | null>(null);
+	let menuContext = $state<string | null>(null);
 
 	function openMenu(e: MouseEvent) {
 		if (e.shiftKey) return; // Shift+right-click bypasses our menu for the browser's native one
 		e.preventDefault();
+		menuContext = (e.target as HTMLElement).closest<HTMLElement>('[data-context-menu]')?.dataset.contextMenu ?? null;
 		menuPos = {
 			x: Math.min(e.clientX, window.innerWidth - MENU_WIDTH),
 			y: Math.min(e.clientY, window.innerHeight - MENU_HEIGHT)
 		};
 	}
 
+	function closeMenu() {
+		menuPos = null;
+		menuContext = null;
+	}
+
 	function openSettingsFromMenu() {
 		settingsUiState.show();
-		menuPos = null;
+		closeMenu();
+	}
+
+	function hideQuoteFromMenu() {
+		configState.update({ hideQuote: true });
+		closeMenu();
+		hideQuote().catch(() => {
+			// best-effort — quote stays hidden locally for this browser even if the save fails
+		});
 	}
 </script>
 
 <svelte:window
 	oncontextmenu={openMenu}
-	onclick={() => (menuPos = null)}
-	onkeydown={(e) => e.key === 'Escape' && (menuPos = null)}
+	onclick={closeMenu}
+	onkeydown={(e) => e.key === 'Escape' && closeMenu()}
 />
 
 {#if menuPos}
 	<div class="app-context-menu" style="top:{menuPos.y}px; left:{menuPos.x}px" role="menu">
+		{#if menuContext === 'quote'}
+			<button class="app-context-menu-item" onclick={hideQuoteFromMenu}>
+				<i class="bi bi-eye-slash-fill"></i> Hide until tomorrow
+			</button>
+		{/if}
 		<button class="app-context-menu-item" onclick={openSettingsFromMenu}>
 			<i class="bi bi-gear-fill"></i> Settings
 		</button>

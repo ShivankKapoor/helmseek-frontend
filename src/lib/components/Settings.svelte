@@ -5,6 +5,7 @@
 	import { saveConfig } from '$lib/api/config';
 	import { saveWeatherCache } from '$lib/api/config';
 	import { geocodeZip, fetchWeather } from '$lib/api/weather';
+	import { hideQuote, unhideQuote } from '$lib/api/quote';
 	import { logout } from '$lib/api/auth';
 	import { COLOR_OPTIONS, FONT_OPTIONS, type QuickLink } from '$lib/types/config';
 
@@ -57,6 +58,18 @@
 	async function update(partial: Partial<typeof configState.config>) {
 		configState.update(partial);
 		if (authState.authenticated) saveConfig(configState.config);
+	}
+
+	// hideQuote is excluded from the general config save (POST /user/config ignores it),
+	// so toggling it has to go through its own dedicated endpoint instead of update().
+	async function toggleHideQuote(e: Event) {
+		const hidden = (e.currentTarget as HTMLInputElement).checked;
+		configState.update({ hideQuote: hidden });
+		try {
+			if (hidden) await hideQuote(); else await unhideQuote();
+		} catch {
+			// best effort — local state still reflects the user's choice
+		}
 	}
 
 	function openSettings() { settingsUiState.show(); zipInput = cfg('weatherZip'); loadAllFonts(); }
@@ -396,6 +409,10 @@
 								<input type="checkbox" checked={cfg('motdEnabled')}
 									onchange={(e) => update({ motdEnabled: e.currentTarget.checked })} />
 								<span>Enable Quote of the Day</span>
+							</label>
+							<label class="toggle-row">
+								<input type="checkbox" checked={cfg('hideQuote')} onchange={toggleHideQuote} />
+								<span>Hide today's quote</span>
 							</label>
 						</div>
 					</div>
