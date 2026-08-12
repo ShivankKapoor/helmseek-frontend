@@ -42,8 +42,22 @@
 	const MAX_STAGGER_MS = 400;
 	const AUTHOR_GAP_MS = 120;
 
-	let quoteChars = $derived(quote ? Array.from(`“${quote}”`) : []);
-	let authorDelay = $derived(Math.min(quoteChars.length * CHAR_STEP_MS, MAX_STAGGER_MS) + AUTHOR_GAP_MS);
+	// Split into word/space tokens (rather than a flat char array) so each word's
+	// character spans can be wrapped in a no-wrap box — keeps the line-wrap opportunities
+	// at spaces only, instead of letting the browser break between any two inline-block chars.
+	let quoteTokens = $derived.by(() => {
+		if (!quote) return [];
+		const full = `“${quote}”`;
+		let index = 0;
+		return full.split(/(\s+)/).filter((part) => part.length > 0).map((part) => {
+			const chars = Array.from(part);
+			const token = { chars, startIndex: index, isSpace: /^\s+$/.test(part) };
+			index += chars.length;
+			return token;
+		});
+	});
+	let totalChars = $derived(quote ? Array.from(`“${quote}”`).length : 0);
+	let authorDelay = $derived(Math.min(totalChars * CHAR_STEP_MS, MAX_STAGGER_MS) + AUTHOR_GAP_MS);
 
 	function charDelay(i: number) {
 		return Math.min(i * CHAR_STEP_MS, MAX_STAGGER_MS);
@@ -53,9 +67,13 @@
 {#if configState.config.motdEnabled && authState.authenticated && !configState.config.hideQuote && !loading && !error && quote}
 	<div class="quote-widget" data-context-menu="quote">
 		<span class="quote-text"
-			>{#each quoteChars as char, i (i)}<span class="ink-char" style="animation-delay: {charDelay(i)}ms"
-					>{char}</span
-				>{/each}</span
+			>{#each quoteTokens as token, ti (ti)}{#if token.isSpace}{token.chars.join('')}{:else}<span
+						class="quote-word"
+						>{#each token.chars as char, ci (ci)}<span
+									class="ink-char"
+									style="animation-delay: {charDelay(token.startIndex + ci)}ms">{char}</span
+								>{/each}</span
+					>{/if}{/each}</span
 		>
 		<span class="quote-author" style="animation-delay: {authorDelay}ms">— {author}</span>
 	</div>
@@ -80,6 +98,11 @@
 	}
 
 	.quote-text { display: block; }
+
+	.quote-word {
+		display: inline-block;
+		white-space: nowrap;
+	}
 
 	.ink-char {
 		display: inline-block;
