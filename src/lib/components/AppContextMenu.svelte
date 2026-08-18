@@ -91,6 +91,7 @@
 		border: none;
 		background: none;
 		color: var(--text-color);
+		font-family: var(--font-family);
 		font-size: 14px;
 		font-style: normal;
 		text-align: left;
