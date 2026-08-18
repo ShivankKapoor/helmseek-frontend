@@ -94,7 +94,9 @@
 				cachedWeatherDescription: w.description, cachedIsDay: w.isDay
 			};
 			configState.update({ ...cache, lastWeatherUpdate: new Date().toISOString() });
-			if (authState.authenticated) { saveConfig(configState.config); saveWeatherCache(cache); }
+			// Await the config save so the backend has the new location before the
+			// weather push arrives — the history row is keyed off the stored location.
+			if (authState.authenticated) { await saveConfig(configState.config); saveWeatherCache(cache); }
 			weatherValidationMessage = `Location set to ${geo.city}`;
 			weatherValidationType = 'success';
 		} catch {
