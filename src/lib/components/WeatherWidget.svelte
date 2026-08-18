@@ -22,6 +22,7 @@
 	});
 
 	async function checkAndRefresh() {
+		if (loading) return;
 		const { lastWeatherUpdate, weatherLat, weatherLng } = configState.config;
 		const isStale = !lastWeatherUpdate ||
 			Date.now() - new Date(lastWeatherUpdate).getTime() > STALE_MS;
