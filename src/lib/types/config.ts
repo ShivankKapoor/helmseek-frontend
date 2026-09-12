@@ -71,18 +71,14 @@ export const DEFAULT_CONFIG: UserConfig = {
 };
 
 export const FONT_OPTIONS = [
-	{ name: 'Arimo',            fallback: 'sans-serif' },
-	{ name: 'Cascadia Code',    fallback: 'monospace'  },
 	{ name: 'Fira Code',        fallback: 'monospace'  },
+	{ name: 'Fraunces',         fallback: 'serif'      },
 	{ name: 'IBM Plex Mono',    fallback: 'monospace'  },
 	{ name: 'Inter',            fallback: 'sans-serif' },
-	{ name: 'JetBrains Mono',   fallback: 'monospace'  },
 	{ name: 'Nunito',           fallback: 'sans-serif' },
 	{ name: 'Roboto',           fallback: 'sans-serif' },
-	{ name: 'Roboto Mono',      fallback: 'monospace'  },
-	{ name: 'Source Code Pro',  fallback: 'monospace'  },
+	{ name: 'Sora',             fallback: 'sans-serif' },
 	{ name: 'Space Mono',       fallback: 'monospace'  },
-	{ name: 'Ubuntu Mono',      fallback: 'monospace'  },
 ] as const;
 
 export const COLOR_OPTIONS = [
