@@ -6,7 +6,7 @@ SvelteKit frontend for [HelmSeek](https://helmseek.com) — a personalized brows
 
 - **SvelteKit 5** with `@sveltejs/adapter-static` (pure SPA, no SSR)
 - **Vite** for bundling
-- **nginx** for serving in production (inside a Podman container)
+- **nginx** for serving in production (inside a Docker container)
 
 ## Requirements
 
@@ -32,16 +32,16 @@ npm run dev
 
 App runs on `http://localhost:5173` by default.
 
-## Running in Production (Podman)
+## Running in Production (Docker)
 
 ```bash
-./run.sh    # build image, start container, begin log streaming
-./stop.sh   # stop container and remove image
+docker compose up -d --build   # build image and start container
+docker compose down            # stop and remove the container
 ```
 
 The container runs on port **3003** via nginx. The `.env` is read at build time — `PUBLIC_API_URL` is baked into the static bundle.
 
-Logs are written to `logs/<timestamp>_CST.log` on the host. A new file is created on each container start.
+Logs are kept by Docker's `local` driver (10 files of 10 MB, oldest dropped first). View them with `docker logs -f helmseek-frontend`. They survive restarts but are deleted with the container, so `docker compose down` or a recreate on `up --build` starts a fresh log.
 
 ## Features
 
