@@ -10,7 +10,8 @@
     "check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:nginx": "bash scripts/verify-nginx.sh"
   },
   "dependencies": {
     "@preact/signals": "^2.11.4",

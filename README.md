@@ -74,6 +74,7 @@ src/
 npm test             # unit and component tests (Vitest + Testing Library)
 npm run test:watch   # re-run those on change
 npm run test:e2e     # end-to-end tests in a real browser (Playwright)
+npm run test:nginx   # builds the Docker image and checks the headers, caching and redirects nginx sends
 npm run check        # type-check
 ```
 

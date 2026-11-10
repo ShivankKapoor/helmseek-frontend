@@ -29,6 +29,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Check what nginx serves in the production image
+        run: npm run test:nginx
+
       - name: Install browser for end-to-end tests
         run: npx playwright install --with-deps chrome
 
