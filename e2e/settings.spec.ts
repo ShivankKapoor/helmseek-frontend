@@ -177,7 +177,7 @@ test.describe('quick links', () => {
 
 		await dialog.getByRole('button', { name: 'Close settings' }).click();
 		const link = page.getByRole('link', { name: 'Docs' });
-		await expect(link).toHaveAttribute('href', 'https://docs.example.com');
+		await expect(link).toHaveAttribute('href', 'https://docs.example.com/');
 		const box = (await link.boundingBox())!;
 		expect(box.x).toBeLessThan(100);
 		expect(box.y).toBeLessThan(100);

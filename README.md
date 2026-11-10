@@ -91,9 +91,10 @@ report that later repaint as the Largest Contentful Paint, which measurably slow
 | `POST /user/weather` | Storing the latest weather reading |
 | `GET /quote`, `POST /quote/hideQuote`, `POST /quote/unhideQuote` | The quote of the day |
 
-The backend validates what it receives. For example, it rejects quick-link URLs that are not
-`http` or `https`. The settings form only shows a hint, so links you add while signed out are not
-checked until they are synced.
+The backend validates what it receives, and it refuses a whole save if any quick link has a bad
+address. So the quick-link form asks for a full `http://` or `https://` address, tidies it (trims it
+and lowercases the scheme and host) and won't accept anything else. If a save to the server still
+fails, the app shows a message instead of failing silently.
 
 ## Project layout
 

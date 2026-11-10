@@ -335,6 +335,7 @@
 
 .setting-item input:focus { border-color: var(--button-bg); box-shadow: 0 0 0 3px rgba(26,115,232,0.1); }
 .setting-item small { color: var(--footer-color); font-size: 0.8rem; }
+.setting-item small.field-error { color: #dc3545; }
 
 .position-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 

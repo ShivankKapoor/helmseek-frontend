@@ -3,12 +3,15 @@ import { config, updateAndSave } from '@/lib/state/config';
 import { isBackdropClick } from '@/lib/utils/dom';
 import type { QuickLink } from '@/lib/types/config';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
+import { normalizeHttpUrl } from '@/lib/utils/url';
 import { CornerPicker } from './CornerPicker';
 import { SettingSection, ToggleRow } from './SettingControls';
 import styles from './Settings.module.css';
 
 const MAX_QUICK_LINKS = 10;
 const MAX_LINK_TEXT_LENGTH = 20;
+const URL_HINT = 'Must start with http:// or https://';
+const URL_ERROR = 'Enter a full address starting with http:// or https://';
 
 type LinkDraft = Pick<QuickLink, 'text' | 'url' | 'corner'>;
 
@@ -125,9 +128,14 @@ function LinkFormModal({ link, onSave, onClose }: LinkFormModalProps) {
 		link ? { text: link.text, url: link.url, corner: link.corner } : EMPTY_DRAFT
 	);
 
+	// Only complain about the address once the user has left the field, not while they are still typing it.
+	const [urlTouched, setUrlTouched] = useState(false);
+
 	useEscapeKey(true, onClose);
 
-	const canSave = draft.text !== '' && draft.url !== '';
+	const normalizedUrl = normalizeHttpUrl(draft.url);
+	const showUrlError = urlTouched && draft.url !== '' && normalizedUrl === null;
+	const canSave = draft.text !== '' && normalizedUrl !== null;
 
 	return (
 		<div class={styles.quickLinkSettingsBackdrop} onClick={(event) => isBackdropClick(event) && onClose()}>
@@ -160,9 +168,14 @@ function LinkFormModal({ link, onSave, onClose }: LinkFormModalProps) {
 							type="url"
 							value={draft.url}
 							onInput={(e) => setDraft({ ...draft, url: e.currentTarget.value })}
+							onBlur={() => setUrlTouched(true)}
 							placeholder="https://example.com"
+							aria-invalid={showUrlError}
+							aria-describedby="link-url-help"
 						/>
-						<small>Must start with http:// or https://</small>
+						<small id="link-url-help" class={showUrlError ? styles.fieldError : undefined} role={showUrlError ? 'alert' : undefined}>
+							{showUrlError ? URL_ERROR : URL_HINT}
+						</small>
 					</div>
 
 					<div class={styles.settingItem}>
@@ -175,7 +188,7 @@ function LinkFormModal({ link, onSave, onClose }: LinkFormModalProps) {
 					<button class={styles.btnSecondary} onClick={onClose}>
 						Cancel
 					</button>
-					<button class={styles.btnPrimary} onClick={() => onSave(draft)} disabled={!canSave}>
+					<button class={styles.btnPrimary} onClick={() => normalizedUrl && onSave({ ...draft, url: normalizedUrl })} disabled={!canSave}>
 						{link ? 'Update' : 'Add'}
 					</button>
 				</div>

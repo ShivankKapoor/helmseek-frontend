@@ -65,12 +65,86 @@ describe('QuickLinksSection', () => {
 		expect(config.value.quickLinks).toHaveLength(2);
 		expect(config.value.quickLinks[1]).toMatchObject({
 			text: 'Docs',
-			url: 'https://docs.example.com',
+			url: 'https://docs.example.com/',
 			corner: 'top-right',
 			enabled: true,
 			order: 1
 		});
 		expect(config.value.quickLinks[1].id).toMatch(/^ql_/);
+	});
+
+	describe('the address field', () => {
+		const openAddForm = async () => {
+			const user = setup();
+			await user.click(screen.getByRole('button', { name: /Add Quick Link/ }));
+			const dialog = screen.getByRole('dialog', { name: 'Add Quick Link' });
+			await user.type(within(dialog).getByLabelText('Link Text'), 'GitHub');
+			return { user, dialog, url: within(dialog).getByLabelText('URL'), add: within(dialog).getByRole('button', { name: 'Add' }) };
+		};
+		const ERROR = 'Enter a full address starting with http:// or https://';
+
+		it('explains the problem once the user leaves a field with an address that would not save', async () => {
+			const { user, dialog, url, add } = await openAddForm();
+			await user.type(url, 'github.com');
+			expect(within(dialog).queryByText(ERROR)).not.toBeInTheDocument(); // still typing
+			await user.tab();
+
+			expect(within(dialog).getByText(ERROR)).toBeInTheDocument();
+			expect(url).toHaveAttribute('aria-invalid', 'true');
+			expect(add).toBeDisabled();
+		});
+
+		it('keeps Add disabled while the address is incomplete, without nagging', async () => {
+			const { user, dialog, url, add } = await openAddForm();
+			await user.type(url, 'htt');
+
+			expect(add).toBeDisabled();
+			expect(within(dialog).queryByText(ERROR)).not.toBeInTheDocument();
+		});
+
+		it('clears the message and enables Add as soon as the address is valid', async () => {
+			const { user, dialog, url, add } = await openAddForm();
+			await user.type(url, 'github.com');
+			await user.tab();
+			await user.clear(url);
+			await user.type(url, 'https://github.com');
+
+			expect(within(dialog).queryByText(ERROR)).not.toBeInTheDocument();
+			expect(add).toBeEnabled();
+		});
+
+		it.each(['javascript:alert(1)', 'ftp://example.com', 'mailto:me@example.com'])('refuses %s', async (address) => {
+			const { user, url, add } = await openAddForm();
+			await user.type(url, address);
+			await user.tab();
+			expect(add).toBeDisabled();
+		});
+
+		it('saves the tidied address: trimmed, lowercase scheme and host', async () => {
+			const { user, url, add } = await openAddForm();
+			await user.type(url, '  HTTPS://GitHub.COM  ');
+			await user.click(add);
+
+			expect(config.value.quickLinks[0].url).toBe('https://github.com/');
+		});
+
+		it('lets the user repair a link that already has a bad address', async () => {
+			const user = setup([makeLink(1, { url: 'example.com' })]);
+			await user.click(screen.getByRole('button', { name: 'Edit Link 1' }));
+			const dialog = screen.getByRole('dialog', { name: 'Edit Quick Link' });
+			const update = within(dialog).getByRole('button', { name: 'Update' });
+			const url = within(dialog).getByLabelText('URL');
+
+			expect(update).toBeDisabled();
+			await user.click(url);
+			await user.tab();
+			expect(within(dialog).getByText(ERROR)).toBeInTheDocument();
+
+			await user.clear(url);
+			await user.type(url, 'https://example.com');
+			await user.click(update);
+			expect(config.value.quickLinks[0].url).toBe('https://example.com/');
+		});
 	});
 
 	it('lets the user pick a corner for the new link', async () => {

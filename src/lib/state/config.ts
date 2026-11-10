@@ -1,7 +1,9 @@
 import { signal } from '@preact/signals';
 import { DEFAULT_CONFIG, type UserConfig } from '@/lib/types/config';
 import { saveConfig } from '@/lib/api/config';
+import { ApiError } from '@/lib/api/client';
 import { authenticated } from './auth';
+import { showToast, toasts } from './toast';
 
 const STORAGE_KEY = 'helm_config';
 
@@ -32,10 +34,21 @@ export function updateConfig(partial: Partial<UserConfig>) {
 	persist();
 }
 
-/** Update locally, then push to the server when signed in (fire and forget). */
+const SAVE_FAILED_MESSAGE = "Couldn't save your changes to the server";
+
+/** Tell the user a background save failed, otherwise their settings silently stop syncing. */
+function reportSaveFailure(error: unknown) {
+	// A 401 is already reported as an expired session.
+	if (error instanceof ApiError && error.status === 401) return;
+	// Several quick changes can fail in a row; one message is enough.
+	if (toasts.value.some((toast) => toast.message === SAVE_FAILED_MESSAGE)) return;
+	showToast(SAVE_FAILED_MESSAGE, 'error');
+}
+
+/** Update locally, then push to the server when signed in (in the background). */
 export function updateAndSave(partial: Partial<UserConfig>) {
 	updateConfig(partial);
-	if (authenticated.value) saveConfig(config.value).catch(() => {});
+	if (authenticated.value) saveConfig(config.value).catch(reportSaveFailure);
 }
 
 /** Replace with the server's copy and mark as synced. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isHttpUrl } from './url';
+import { isHttpUrl, normalizeHttpUrl } from './url';
 
 describe('isHttpUrl', () => {
 	it.each([
@@ -30,4 +30,28 @@ describe('isHttpUrl', () => {
 	])('rejects %j', (value) => {
 		expect(isHttpUrl(value)).toBe(false);
 	});
+});
+
+describe('normalizeHttpUrl', () => {
+	it.each([
+		['https://example.com', 'https://example.com/'],
+		['  HTTPS://Example.COM  ', 'https://example.com/'],
+		['http://example.com/Path?q=1#top', 'http://example.com/Path?q=1#top'],
+		['https://example.com/a b', 'https://example.com/a%20b']
+	])('turns %j into %j', (input, expected) => {
+		expect(normalizeHttpUrl(input)).toBe(expected);
+	});
+
+	it('always starts with a lowercase http:// or https://, which is what the backend requires', () => {
+		for (const input of ['HTTP://a.com', 'Https://b.com', ' https://c.com ']) {
+			expect(normalizeHttpUrl(input)).toMatch(/^https?:\/\//);
+		}
+	});
+
+	it.each(['github.com', 'javascript:alert(1)', 'ftp://example.com', 'https://', '//example.com', ''])(
+		'returns null for %j',
+		(input) => {
+			expect(normalizeHttpUrl(input)).toBeNull();
+		}
+	);
 });

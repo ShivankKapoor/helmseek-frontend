@@ -24,6 +24,8 @@ const API_PATHS = /^\/(user|auth|quote)(\/|$)/;
 export class FakeApi {
 	signedIn = false;
 	rateLimited = false;
+	/** When set, saving the config fails with this status (to simulate a server error). */
+	rejectSavesWith: number | null = null;
 	quote = SAMPLE_QUOTE;
 	readonly requests: RecordedRequest[] = [];
 
@@ -76,10 +78,15 @@ export class FakeApi {
 			case 'GET /user/config':
 				return this.signedIn ? json(this.serverConfig) : status(401);
 
-			case 'POST /user/config':
+			case 'POST /user/config': {
 				if (!this.signedIn) return status(401);
-				this.serverConfig = this.requests.at(-1)!.body as UserConfigDTO;
+				const saved = this.requests.at(-1)!.body as UserConfigDTO;
+				if (this.rejectSavesWith) return status(this.rejectSavesWith);
+				// Like the real backend: one bad quick-link address makes it refuse the whole save.
+				if (!hasOnlyHttpLinks(saved.quickLinks)) return status(400);
+				this.serverConfig = saved;
 				return status(200);
+			}
 
 			case 'POST /user/weather':
 				return this.signedIn ? status(200) : status(401);
@@ -110,6 +117,13 @@ export class FakeApi {
 				return status(404);
 		}
 	}
+}
+
+/** The backend only accepts quick links whose address starts with a lowercase http:// or https://. */
+function hasOnlyHttpLinks(quickLinksJson: string): boolean {
+	return (JSON.parse(quickLinksJson) as QuickLink[]).every(
+		(link) => link.url.startsWith('http://') || link.url.startsWith('https://')
+	);
 }
 
 function parseBody(raw: string | null): unknown {

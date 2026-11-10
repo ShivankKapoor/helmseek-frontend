@@ -1,12 +1,19 @@
 /**
- * True for an absolute http(s) address. Used before offering to open a link the user typed in,
- * so that addresses like `javascript:` or `data:` are never launched.
+ * The address as a clean `http://` or `https://` URL, or null if it isn't one.
+ *
+ * Whitespace is trimmed and the scheme is lowercased. That matters because the backend only accepts
+ * quick links that start with a lowercase `http://` or `https://`, and refuses the whole save otherwise.
  */
-export function isHttpUrl(value: string): boolean {
+export function normalizeHttpUrl(value: string): string | null {
 	try {
-		const { protocol } = new URL(value);
-		return protocol === 'http:' || protocol === 'https:';
+		const url = new URL(value.trim());
+		return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null;
 	} catch {
-		return false; // not an absolute URL at all
+		return null; // not an absolute URL at all
 	}
+}
+
+/** True for an absolute http(s) address, so `javascript:`, `data:` and the like are never launched. */
+export function isHttpUrl(value: string): boolean {
+	return normalizeHttpUrl(value) !== null;
 }
