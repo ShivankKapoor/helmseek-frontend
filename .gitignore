@@ -1,7 +1,8 @@
-.svelte-kit/
 build/
 node_modules/
 logs/
 .env
 .env.*
 !.env.example
+playwright-report/
+test-results/

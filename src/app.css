@@ -54,6 +54,13 @@ body {
   border: 0;
 }
 
+main {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 /* ── Search Box (global — used by SearchBar component) ── */
 .search-box {
   display: flex;
@@ -92,6 +99,7 @@ body {
 
 .search-box input {
   flex: 1;
+  min-width: 0; /* let the input shrink on narrow screens instead of pushing the button out */
   border: none;
   padding: 12px 8px 12px 0;
   font-size: 18px;

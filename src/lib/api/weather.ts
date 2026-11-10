@@ -1,4 +1,4 @@
-import type { GeoLocation, WeatherResult } from '$lib/types/weather';
+import type { GeoLocation, WeatherResult } from '@/lib/types/weather';
 
 const GEOCODE_API = 'https://geocoding-api.open-meteo.com/v1/search';
 const WEATHER_API = 'https://api.open-meteo.com/v1/forecast';
