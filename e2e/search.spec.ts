@@ -56,6 +56,34 @@ test.describe('empty search', () => {
 		await expect(page).toHaveURL('/');
 	});
 
+	test('searches right away once something is typed, without waiting for the nudge to go away', async ({ page }) => {
+		await page.getByRole('button', { name: 'Search', exact: true }).click();
+		await expect(page.locator('.empty-search-popup.show')).toBeVisible();
+
+		await searchBox(page).fill('cats');
+		await searchBox(page).press('Enter');
+		await expect(page).toHaveURL('https://www.google.com/search?q=cats');
+	});
+
+	test('the Search button works right away too', async ({ page }) => {
+		await searchBox(page).press('Enter');
+		await expect(page.locator('.empty-search-popup.show')).toBeVisible();
+
+		await searchBox(page).fill('dogs');
+		await page.getByRole('button', { name: 'Search', exact: true }).click();
+		await expect(page).toHaveURL('https://www.google.com/search?q=dogs');
+	});
+
+	test('copies a calculator answer and confirms it while the nudge is still showing', async ({ page }) => {
+		await searchBox(page).press('Enter');
+		await expect(page.locator('.empty-search-popup.show')).toBeVisible();
+
+		await searchBox(page).fill('=6*7');
+		await page.getByRole('button', { name: 'Search', exact: true }).click();
+		await expect(page.getByText('Copied to clipboard!')).toBeVisible();
+		expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('42');
+	});
+
 	test('treats whitespace as empty', async ({ page }) => {
 		await searchBox(page).fill('   ');
 		await searchBox(page).press('Enter');

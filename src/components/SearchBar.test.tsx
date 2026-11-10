@@ -77,6 +77,26 @@ describe('SearchBar', () => {
 			expect(window.location.href).toBe('http://localhost/');
 		});
 
+		it('still searches right away once something is typed', async () => {
+			const { user, input } = setup();
+			await user.click(screen.getByRole('button', { name: 'Search' }));
+			expect((await screen.findAllByRole('status'))[0]).toHaveClass('show');
+
+			await user.type(input, 'cats{Enter}');
+			expect(window.location.href).toBe('https://www.google.com/search?q=cats');
+		});
+
+		it('still copies a calculator answer, and says so, while the nudge is showing', async () => {
+			const { user, input, writeText } = setup();
+			await user.click(screen.getByRole('button', { name: 'Search' }));
+			expect((await screen.findAllByRole('status'))[0]).toHaveClass('show');
+
+			await user.type(input, '=6*7');
+			await user.click(screen.getByRole('button', { name: 'Search' }));
+			expect(writeText).toHaveBeenCalledWith('42');
+			expect(await screen.findByText('Copied to clipboard!')).toBeInTheDocument();
+		});
+
 		it('treats whitespace as empty', async () => {
 			const { user, input } = setup();
 			await user.type(input, '   {Enter}');

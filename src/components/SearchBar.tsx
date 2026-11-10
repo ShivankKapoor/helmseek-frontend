@@ -36,32 +36,33 @@ interface Shake {
 	durationSeconds: number;
 }
 
-/** One transient popup at a time: fades in, stays for `visibleMs`, fades out. */
+/** One transient popup at a time: fades in, stays for `visibleMs`, fades out. A newer popup replaces the current one. */
 function usePopup() {
 	const [popup, setPopup] = useState<Popup | null>(null);
 	const [phase, setPhase] = useState<PopupPhase>('show');
-	const isActive = useRef(false);
+	const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+	const clearTimers = () => timers.current.forEach(clearTimeout);
+	useEffect(() => clearTimers, []);
 
 	function showPopup(next: Popup, visibleMs: number) {
-		if (isActive.current) return;
-		isActive.current = true;
+		clearTimers(); // otherwise the old popup's timers would hide the new one early
 		setPopup(next);
 		setPhase('show');
-		setTimeout(() => setPhase('hide'), visibleMs);
-		setTimeout(() => {
-			setPopup(null);
-			isActive.current = false;
-		}, visibleMs + POPUP_FADE_MS);
+		timers.current = [
+			setTimeout(() => setPhase('hide'), visibleMs),
+			setTimeout(() => setPopup(null), visibleMs + POPUP_FADE_MS)
+		];
 	}
 
-	return { popup, phase, isActive, showPopup };
+	return { popup, phase, showPopup };
 }
 
 export function SearchBar() {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [calculation, setCalculation] = useState<Calculation | null>(null);
 	const [shake, setShake] = useState<Shake | null>(null);
-	const { popup, phase, isActive: isPopupActive, showPopup } = usePopup();
+	const { popup, phase, showPopup } = usePopup();
 
 	useEffect(() => {
 		const id = setTimeout(() => inputRef.current?.focus(), AUTOFOCUS_DELAY_MS);
@@ -84,23 +85,30 @@ export function SearchBar() {
 
 	function handleSubmit(event: Event) {
 		event.preventDefault();
-		if (shake || isPopupActive.current) return;
 
 		const query = (inputRef.current?.value ?? '').trim();
 		if (!query) {
-			shakeSearchBox();
-			showPopup(
-				{ kind: 'empty', message: EMPTY_SEARCH_MESSAGES[Math.floor(Math.random() * EMPTY_SEARCH_MESSAGES.length)] },
-				EMPTY_POPUP_VISIBLE_MS
-			);
-			inputRef.current?.focus();
+			nudgeToType();
 			return;
 		}
+		// A real search is never held back by an animation or popup that is still on screen.
 		if (calculation) {
 			copyResult(calculation.result);
 			return;
 		}
 		window.location.href = `${SEARCH_URL}?q=${encodeURIComponent(query)}`;
+	}
+
+	/** Shake the box and show a hint. Ignored while the last nudge is still playing, so pressing Enter repeatedly doesn't restart it. */
+	function nudgeToType() {
+		inputRef.current?.focus();
+		if (shake || popup?.kind === 'empty') return;
+
+		shakeSearchBox();
+		showPopup(
+			{ kind: 'empty', message: EMPTY_SEARCH_MESSAGES[Math.floor(Math.random() * EMPTY_SEARCH_MESSAGES.length)] },
+			EMPTY_POPUP_VISIBLE_MS
+		);
 	}
 
 	async function copyResult(result: string) {
