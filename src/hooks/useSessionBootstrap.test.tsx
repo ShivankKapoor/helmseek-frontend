@@ -3,7 +3,7 @@ import { render, waitFor } from '@testing-library/preact';
 import { DEFAULT_CONFIG } from '@/lib/types/config';
 import { apiFetch } from '@/lib/api/client';
 import { authenticated, checking, username } from '@/lib/state/auth';
-import { config } from '@/lib/state/config';
+import { config, loadConfig } from '@/lib/state/config';
 import { toasts } from '@/lib/state/toast';
 import { jsonResponse, resetAppState } from '@/test/helpers';
 import { useSessionBootstrap } from './useSessionBootstrap';
@@ -28,15 +28,6 @@ afterEach(() => {
 });
 
 describe('useSessionBootstrap', () => {
-	it('shows the cached config straight away, before the server answers', () => {
-		localStorage.setItem('helm_config', JSON.stringify({ themeMode: 'dark' }));
-		fetchMock.mockReturnValue(new Promise(() => {}));
-		render(<Harness />);
-
-		expect(config.value.themeMode).toBe('dark');
-		expect(checking.value).toBe(true);
-	});
-
 	it("signs in with the server's config when there is a valid session", async () => {
 		fetchMock.mockResolvedValue(jsonResponse(serverConfig));
 		render(<Harness />);
@@ -58,6 +49,7 @@ describe('useSessionBootstrap', () => {
 
 	it("keeps a signed-out visitor's saved settings", async () => {
 		localStorage.setItem('helm_config', JSON.stringify({ themeMode: 'dark', fontFamily: 'Sora' }));
+		loadConfig(); // main.tsx does this before the app renders
 		fetchMock.mockResolvedValue(jsonResponse({}, 401));
 		render(<Harness />);
 

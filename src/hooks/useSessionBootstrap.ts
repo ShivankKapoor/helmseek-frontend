@@ -31,10 +31,9 @@ function handleSessionExpired() {
 	showToast('Session expired — please sign in again', 'error');
 }
 
-/** On startup: show the cached config immediately, then check for a server session. */
+/** On startup, check whether the browser has a server session. */
 export function useSessionBootstrap() {
 	useEffect(() => {
-		loadConfig();
 		restoreSession();
 		setUnauthorizedHandler(handleSessionExpired);
 	}, []);
