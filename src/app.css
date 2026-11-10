@@ -202,6 +202,7 @@ main {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .settings-modal {
@@ -216,6 +217,12 @@ main {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  animation: slideIn 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-backdrop,
+  .settings-modal { animation: none; }
 }
 
 .settings-header {

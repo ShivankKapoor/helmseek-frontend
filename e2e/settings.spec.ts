@@ -33,6 +33,19 @@ test.describe('opening and closing', () => {
 		await expect(dialog).toBeHidden();
 	});
 
+	test('animates in like the account popups do', async ({ page }) => {
+		const dialog = await openSettings(page);
+		await expect(dialog).toHaveCSS('animation-name', 'slideIn');
+		await expect(dialog.locator('xpath=..')).toHaveCSS('animation-name', 'fadeIn');
+	});
+
+	test('skips the animation for people who prefer reduced motion', async ({ page }) => {
+		await page.emulateMedia({ reducedMotion: 'reduce' });
+		const dialog = await openSettings(page);
+		await expect(dialog).toHaveCSS('animation-name', 'none');
+		await expect(dialog.locator('xpath=..')).toHaveCSS('animation-name', 'none');
+	});
+
 	test('opens from the right-click menu', async ({ page }) => {
 		await page.mouse.click(400, 300, { button: 'right' });
 		await page.getByRole('menuitem', { name: 'Settings' }).click();
