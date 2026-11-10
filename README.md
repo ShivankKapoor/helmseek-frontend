@@ -4,8 +4,9 @@ SvelteKit frontend for [HelmSeek](https://helmseek.com) — a personalized brows
 
 ## Stack
 
-- **SvelteKit 5** with `@sveltejs/adapter-static` (pure SPA, no SSR)
-- **Vite** for bundling
+- **Preact** + **@preact/signals** for UI and state (about 23 KB of JS, gzipped)
+- **TypeScript** and **Vite**, with CSS Modules for component styles
+- A pure static SPA, with no server rendering
 - **nginx** for serving in production (inside a Docker container)
 
 ## Requirements
@@ -47,10 +48,27 @@ Logs are kept by Docker's `local` driver (10 files of 10 MB, oldest dropped firs
 
 - **Search** — configurable default search engine
 - **Clock & greeting** — time-aware greeting message
-- **Weather widget** — OpenWeatherMap integration, configurable position, cached locally
+- **Weather widget** — Open-Meteo integration, configurable position, cached locally
 - **Quick links** — up to 8 custom bookmarks, URL-validated (http/https only)
 - **Theme** — light/dark mode, multiple color schemes
 - **Config sync** — authenticated users can sync settings across devices via the backend
+
+## Project layout
+
+```
+src/
+  main.tsx, App.tsx     entry point and page composition
+  components/           one component per widget or modal (styles in *.module.css)
+    settings/           the settings modal, split into one component per section
+  hooks/                shared behavior (theme, session bootstrap, sync status, ...)
+  lib/
+    api/                backend and weather API calls
+    state/              signals: config, auth, toasts, settings modal
+    types/, utils/      shared types and pure helpers
+  app.css               global styles shared across components
+```
+
+Run `npm run check` to type-check.
 
 ## Building
 

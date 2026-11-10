@@ -54,6 +54,13 @@ body {
   border: 0;
 }
 
+main {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 /* ── Search Box (global — used by SearchBar component) ── */
 .search-box {
   display: flex;
