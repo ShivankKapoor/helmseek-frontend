@@ -53,6 +53,7 @@ function SettingsModal() {
 					<SettingSection title="Color Scheme">
 						<select
 							class="color-selector-dropdown"
+							aria-label="Color scheme"
 							value={cfg.selectedColor}
 							onChange={(e) => updateAndSave({ selectedColor: e.currentTarget.value })}
 						>

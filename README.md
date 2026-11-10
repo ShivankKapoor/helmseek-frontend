@@ -68,7 +68,25 @@ src/
   app.css               global styles shared across components
 ```
 
-Run `npm run check` to type-check.
+## Testing
+
+```bash
+npm test             # unit and component tests (Vitest + Testing Library)
+npm run test:watch   # re-run those on change
+npm run test:e2e     # end-to-end tests in a real browser (Playwright)
+npm run check        # type-check
+```
+
+Tests sit next to the code they cover (`*.test.ts`, `*.test.tsx`). They cover the pure logic
+(calculator, weather and time helpers), the state and API layers, and the flows where a
+regression would hurt: sign-in, quick links, settings visibility, the widgets, and session expiry.
+The API is always mocked, so no backend or account is needed.
+
+The end-to-end tests (`e2e/`) build the app, serve it, and drive it in Google Chrome. A small
+in-memory fake backend (`e2e/fixtures.ts`) answers the API calls, and fonts, icons, weather and
+Google are stubbed, so the tests are repeatable and work offline. They use your installed Chrome;
+in CI, `npx playwright install --with-deps chrome` provides it. If a test fails, open the trace with
+`npx playwright show-trace test-results/<test>/trace.zip`.
 
 ## Building
 

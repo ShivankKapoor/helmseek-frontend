@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import preact from '@preact/preset-vite';
 import { fileURLToPath } from 'node:url';
 
@@ -15,5 +15,12 @@ export default defineConfig({
 	},
 	server: { port: 3003 },
 	// Same output directory the Dockerfile already copies into nginx.
-	build: { outDir: 'build' }
+	build: { outDir: 'build' },
+	test: {
+		environment: 'jsdom',
+		setupFiles: ['./src/test/setup.ts'],
+		include: ['src/**/*.test.{ts,tsx}'],
+		// Pin the API URL so tests don't depend on a developer's local .env.
+		env: { PUBLIC_API_URL: 'http://api.test' }
+	}
 });

@@ -99,6 +99,7 @@ main {
 
 .search-box input {
   flex: 1;
+  min-width: 0; /* let the input shrink on narrow screens instead of pushing the button out */
   border: none;
   padding: 12px 8px 12px 0;
   font-size: 18px;

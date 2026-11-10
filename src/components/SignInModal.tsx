@@ -5,7 +5,7 @@ import { fetchConfig } from '@/lib/api/config';
 import { setAuthenticated } from '@/lib/state/auth';
 import { isBackdropClick } from '@/lib/utils/dom';
 import { replaceConfig } from '@/lib/state/config';
-import { WAS_AUTHENTICATED_KEY } from '@/lib/state/session';
+import { rememberSignedIn } from '@/lib/state/session';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
 import styles from './SignInModal.module.css';
 
@@ -54,7 +54,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
 			return;
 		}
 
-		localStorage.setItem(WAS_AUTHENTICATED_KEY, '1');
+		rememberSignedIn();
 		try {
 			const serverConfig = await fetchConfig();
 			replaceConfig(serverConfig);

@@ -3,7 +3,7 @@ import { fetchConfig } from '@/lib/api/config';
 import { setUnauthorizedHandler } from '@/lib/api/client';
 import { loadConfig, replaceConfig, resetConfig } from '@/lib/state/config';
 import { setAuthenticated, setUnauthenticated } from '@/lib/state/auth';
-import { WAS_AUTHENTICATED_KEY } from '@/lib/state/session';
+import { rememberSignedIn, WAS_AUTHENTICATED_KEY } from '@/lib/state/session';
 import { showToast } from '@/lib/state/toast';
 
 async function restoreSession() {
@@ -11,6 +11,7 @@ async function restoreSession() {
 		const serverConfig = await fetchConfig();
 		replaceConfig(serverConfig);
 		setAuthenticated(serverConfig.username);
+		rememberSignedIn();
 	} catch {
 		setUnauthenticated();
 	}
@@ -18,11 +19,16 @@ async function restoreSession() {
 
 function handleSessionExpired() {
 	const wasSignedIn = localStorage.getItem(WAS_AUTHENTICATED_KEY) !== null;
-	localStorage.removeItem(WAS_AUTHENTICATED_KEY);
 	setUnauthenticated();
+
+	// A visitor who never signed in has no account to expire. This also fires for the
+	// startup session check, so don't wipe their locally saved settings.
+	if (!wasSignedIn) return;
+
+	localStorage.removeItem(WAS_AUTHENTICATED_KEY);
 	resetConfig();
 	loadConfig();
-	if (wasSignedIn) showToast('Session expired — please sign in again', 'error');
+	showToast('Session expired — please sign in again', 'error');
 }
 
 /** On startup: show the cached config immediately, then check for a server session. */
