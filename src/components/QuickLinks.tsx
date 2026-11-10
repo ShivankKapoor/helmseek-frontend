@@ -55,6 +55,8 @@ function QuickLinkItem({ link }: { link: QuickLink }) {
 			href={link.url}
 			class={styles.quickLink}
 			title={link.url}
+			data-context-menu="link"
+			data-link-url={link.url}
 			onMouseMove={handleMouseMove}
 			onMouseLeave={handleMouseLeave}
 		>

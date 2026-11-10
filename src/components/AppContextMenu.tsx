@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { hideQuote } from '@/lib/api/quote';
 import { updateConfig } from '@/lib/state/config';
 import { openSettings } from '@/lib/state/settingsUi';
+import { isHttpUrl } from '@/lib/utils/url';
 import styles from './AppContextMenu.module.css';
 
 interface MenuState {
@@ -10,6 +11,8 @@ interface MenuState {
 	y: number;
 	/** Value of the clicked element's closest `data-context-menu` attribute, if any. */
 	context: string | null;
+	/** For a quick link, the address it points to (from `data-link-url`). */
+	linkUrl: string | null;
 }
 
 /** Replaces the browser's right-click menu. Shift+right-click still opens the native one. */
@@ -22,11 +25,12 @@ export function AppContextMenu() {
 		const open = (event: MouseEvent) => {
 			if (event.shiftKey) return;
 			event.preventDefault();
-			const target = event.target as HTMLElement;
+			const source = (event.target as HTMLElement).closest<HTMLElement>('[data-context-menu]');
 			setMenu({
 				x: event.clientX,
 				y: event.clientY,
-				context: target.closest<HTMLElement>('[data-context-menu]')?.dataset.contextMenu ?? null
+				context: source?.dataset.contextMenu ?? null,
+				linkUrl: source?.dataset.linkUrl ?? null
 			});
 		};
 		const closeOnEscape = (event: KeyboardEvent) => {
@@ -62,9 +66,22 @@ export function AppContextMenu() {
 		hideQuote().catch(() => {});
 	}
 
+	// Only offer to open addresses that are safe to launch (never `javascript:` and the like).
+	const linkUrl = menu.context === 'link' && menu.linkUrl && isHttpUrl(menu.linkUrl) ? menu.linkUrl : null;
+
 	return (
 		// The unit is written out: Preact does not add "px" to a bare number in a style.
 		<div ref={menuRef} class={styles.appContextMenu} style={`top: ${menu.y}px; left: ${menu.x}px`} role="menu">
+			{linkUrl && (
+				<>
+					<a class={styles.appContextMenuItem} role="menuitem" href={linkUrl} target="_blank" rel="noopener noreferrer">
+						<i class="bi bi-box-arrow-up-right" aria-hidden="true" /> Open in new tab
+					</a>
+					<a class={styles.appContextMenuItem} role="menuitem" href={linkUrl}>
+						<i class="bi bi-window" aria-hidden="true" /> Open in current tab
+					</a>
+				</>
+			)}
 			{menu.context === 'quote' && (
 				<button class={styles.appContextMenuItem} role="menuitem" onClick={hideQuoteUntilTomorrow}>
 					<i class="bi bi-eye-slash-fill" aria-hidden="true" /> Hide until tomorrow

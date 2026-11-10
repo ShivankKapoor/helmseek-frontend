@@ -35,6 +35,7 @@
 	font-size: 14px;
 	font-style: normal;
 	text-align: left;
+	text-decoration: none; /* some items are links */
 	cursor: pointer;
 }
 

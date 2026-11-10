@@ -87,3 +87,99 @@ test.describe('right-click menu', () => {
 		await expect(page.getByRole('menu')).toHaveCount(0);
 	});
 });
+
+test.describe('right-click menu on a quick link', () => {
+	const DOCS_URL = 'https://docs.example.com/';
+
+	const quickLink = (overrides: Record<string, unknown> = {}) => ({
+		id: 'ql_1', enabled: true, text: 'Docs', url: DOCS_URL, corner: 'top-left', order: 0, ...overrides
+	});
+
+	/** Saves quick links into the browser's local settings before the page loads. */
+	const seedQuickLinks = (page: Page, links: unknown[]) =>
+		page.addInitScript((quickLinks) => {
+			localStorage.setItem('helm_config', JSON.stringify({ quickLinksEnabled: true, quickLinks }));
+		}, links);
+
+	test.beforeEach(async ({ page }) => {
+		// The destination is stubbed for the page and for any new tab the menu opens.
+		await page.context().route(`${DOCS_URL}**`, (route) =>
+			route.fulfill({ contentType: 'text/html', body: '<title>Docs</title>' })
+		);
+	});
+
+	test('offers new tab and current tab, next to Settings', async ({ page }) => {
+		await seedQuickLinks(page, [quickLink()]);
+		await page.goto('/');
+		await page.getByRole('link', { name: 'Docs' }).click({ button: 'right' });
+
+		const menu = page.getByRole('menu');
+		await expect(menu.getByRole('menuitem')).toHaveText([/Open in new tab/, /Open in current tab/, /Settings/]);
+	});
+
+	test('"Open in current tab" loads the link in this tab', async ({ page }) => {
+		await seedQuickLinks(page, [quickLink()]);
+		await page.goto('/');
+		await page.getByRole('link', { name: 'Docs' }).click({ button: 'right' });
+		await page.getByRole('menuitem', { name: 'Open in current tab' }).click();
+
+		await expect(page).toHaveURL(DOCS_URL);
+	});
+
+	test('"Open in new tab" opens a second tab and leaves this one alone', async ({ page }) => {
+		await seedQuickLinks(page, [quickLink()]);
+		await page.goto('/');
+		await page.getByRole('link', { name: 'Docs' }).click({ button: 'right' });
+
+		// Chrome already implies noopener for target=_blank, but other browsers rely on the attribute.
+		const newTabItem = page.getByRole('menuitem', { name: 'Open in new tab' });
+		await expect(newTabItem).toHaveAttribute('target', '_blank');
+		await expect(newTabItem).toHaveAttribute('rel', 'noopener noreferrer');
+
+		const [newTab] = await Promise.all([page.waitForEvent('popup'), newTabItem.click()]);
+
+		await newTab.waitForURL(DOCS_URL);
+		await expect(page).toHaveURL('/');
+		// noopener: the new page cannot reach back into HelmSeek.
+		expect(await newTab.evaluate(() => window.opener)).toBeNull();
+		await expect(page.getByRole('menu')).toHaveCount(0);
+	});
+
+	test('a normal left click still opens the link in this tab', async ({ page }) => {
+		await seedQuickLinks(page, [quickLink()]);
+		await page.goto('/');
+		await page.getByRole('link', { name: 'Docs' }).click();
+
+		await expect(page).toHaveURL(DOCS_URL);
+	});
+
+	test('the link items only appear on a link, not elsewhere on the page', async ({ page }) => {
+		await seedQuickLinks(page, [quickLink()]);
+		await page.goto('/');
+		await rightClickAt(page, 640, 600);
+
+		await expect(page.getByRole('menuitem', { name: 'Settings' })).toBeVisible();
+		await expect(page.getByRole('menuitem', { name: /Open in/ })).toHaveCount(0);
+	});
+
+	test('never offers to open an address that is not http or https', async ({ page }) => {
+		page.on('dialog', (dialog) => { throw new Error(`a script ran: ${dialog.message()}`); });
+		await seedQuickLinks(page, [quickLink({ text: 'Sneaky', url: 'javascript:alert(1)' })]);
+		await page.goto('/');
+		await page.getByRole('link', { name: 'Sneaky' }).click({ button: 'right' });
+
+		await expect(page.getByRole('menuitem', { name: 'Settings' })).toBeVisible();
+		await expect(page.getByRole('menuitem', { name: /Open in/ })).toHaveCount(0);
+	});
+
+	test('the taller link menu stays on screen for a link near the bottom edge', async ({ page }) => {
+		await seedQuickLinks(page, [quickLink({ corner: 'bottom-left' })]);
+		await page.goto('/');
+		await page.getByRole('link', { name: 'Docs' }).click({ button: 'right' });
+
+		const box = await openedMenuBox(page.getByRole('menu'));
+		expect(box.y).toBeGreaterThanOrEqual(0);
+		expect(box.y + box.height).toBeLessThanOrEqual(VIEWPORT.height);
+		expect(box.x + box.width).toBeLessThanOrEqual(VIEWPORT.width);
+	});
+});
