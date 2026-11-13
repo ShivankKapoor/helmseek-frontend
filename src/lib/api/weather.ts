@@ -2,9 +2,12 @@ import type { GeoLocation, WeatherResult } from '@/lib/types/weather';
 
 const GEOCODE_API = 'https://geocoding-api.open-meteo.com/v1/search';
 const WEATHER_API = 'https://api.open-meteo.com/v1/forecast';
+const REQUEST_TIMEOUT_MS = 30_000;
 
 export async function geocodeZip(zip: string): Promise<GeoLocation> {
-	const res = await fetch(`${GEOCODE_API}?name=${encodeURIComponent(zip)}&count=5&language=en&format=json`);
+	const res = await fetch(`${GEOCODE_API}?name=${encodeURIComponent(zip)}&count=5&language=en&format=json`, {
+		signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+	});
 	if (!res.ok) throw new Error('Geocoding failed');
 	const data = await res.json();
 	const results: any[] = data.results ?? [];
@@ -22,7 +25,7 @@ export async function fetchWeather(lat: number, lng: number): Promise<WeatherRes
 		windspeed_unit: 'mph',
 		timezone: 'auto'
 	});
-	const res = await fetch(`${WEATHER_API}?${params}`);
+	const res = await fetch(`${WEATHER_API}?${params}`, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 	if (!res.ok) throw new Error('Weather fetch failed');
 	const data = await res.json();
 	const cw = data.current_weather;
