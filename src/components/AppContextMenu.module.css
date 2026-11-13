@@ -5,7 +5,7 @@
 	border: 1px solid rgba(128, 128, 128, 0.3);
 	border-radius: 6px;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-	z-index: 1000;
+	z-index: 3000; /* above the corner buttons, modals and settings (2000) */
 	padding: 4px 0;
 	min-width: 160px;
 	font-family: var(--font-family);
@@ -18,14 +18,26 @@
 	transition: top 0.18s ease-out, left 0.18s ease-out;
 }
 
+/* Played when the menu is dismissed. Clicks pass through it while it fades. */
+.app-context-menu.closing {
+	animation: context-menu-out 0.12s ease-in forwards;
+	pointer-events: none;
+}
+
 @keyframes context-menu-in {
 	from { opacity: 0; transform: scale(0.92); }
 	to   { opacity: 1; transform: scale(1); }
 }
 
+@keyframes context-menu-out {
+	from { opacity: 1; transform: scale(1); }
+	to   { opacity: 0; transform: scale(0.92); }
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.app-context-menu { animation: none; }
 	.app-context-menu.gliding { transition: none; }
+	.app-context-menu.closing { animation: none; }
 }
 
 .app-context-menu-item {

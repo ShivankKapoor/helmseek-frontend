@@ -148,14 +148,73 @@ describe('AppContextMenu gliding', () => {
 		expect(menu().style.left).toBe('100px');
 	});
 
-	it('does not glide when reopened after being closed', () => {
+	it('does not glide when reopened after being closed', async () => {
 		renderPage();
 		fireEvent.contextMenu(document.body, { clientX: 10, clientY: 20 });
 		fireEvent.contextMenu(document.body, { clientX: 100, clientY: 200 });
 		fireEvent.click(document.body);
-		expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+		await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
 
 		fireEvent.contextMenu(document.body, { clientX: 50, clientY: 60 });
 		expect(menu().className).not.toMatch(/gliding/);
 	});
 });
+
+describe('AppContextMenu closing', () => {
+	it('plays its exit animation before it is removed', async () => {
+		renderPage();
+		fireEvent.contextMenu(document.body);
+		fireEvent.click(document.body);
+
+		expect(screen.getByRole('menu').className).toMatch(/closing/);
+		await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
+	});
+
+	it('closes on Escape the same way', async () => {
+		renderPage();
+		fireEvent.contextMenu(document.body);
+		fireEvent.keyDown(window, { key: 'Escape' });
+
+		expect(screen.getByRole('menu').className).toMatch(/closing/);
+		await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
+	});
+
+	it('stays open if it is right-clicked again while closing', async () => {
+		renderPage();
+		fireEvent.contextMenu(document.body, { clientX: 10, clientY: 20 });
+		fireEvent.click(document.body);
+		fireEvent.contextMenu(document.body, { clientX: 100, clientY: 200 });
+
+		const menu = screen.getByRole('menu');
+		expect(menu.className).not.toMatch(/closing/);
+		expect(menu.className).not.toMatch(/gliding/);
+		await new Promise((resolve) => setTimeout(resolve, 200));
+		expect(screen.getByRole('menu')).toBeInTheDocument();
+	});
+
+	it('closes after an item is picked', async () => {
+		setAuthenticated('test');
+		renderPage();
+		rightClickWidget();
+		fireEvent.click(screen.getByRole('menuitem', { name: /sync/i }));
+
+		expect(screen.getByRole('menu').className).toMatch(/closing/);
+		await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
+	});
+
+	it('is removed without waiting for the animation when reduced motion is preferred', async () => {
+		const original = window.matchMedia;
+		window.matchMedia = vi.fn().mockReturnValue({ matches: true }) as unknown as typeof window.matchMedia;
+		try {
+			renderPage();
+			fireEvent.contextMenu(document.body);
+			fireEvent.click(document.body);
+
+			// Well under the 120ms the animation would take.
+			await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument(), { timeout: 60 });
+		} finally {
+			window.matchMedia = original;
+		}
+	});
+});
+

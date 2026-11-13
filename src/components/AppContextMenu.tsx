@@ -18,6 +18,15 @@ interface MenuState {
 	linkUrl: string | null;
 	/** True when the menu was already open and has moved, so it should glide instead of jump. */
 	gliding: boolean;
+	/** True while the menu plays its exit animation, just before it is removed. */
+	closing: boolean;
+}
+
+/** Matches the length of the exit animation in the stylesheet. */
+const CLOSE_ANIMATION_MS = 120;
+
+function prefersReducedMotion(): boolean {
+	return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 /** Replaces the browser's right-click menu. Shift+right-click still opens the native one. */
@@ -26,7 +35,7 @@ export function AppContextMenu() {
 	const menuRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		const close = () => setMenu(null);
+		const close = () => setMenu((previous) => (previous && !previous.closing ? { ...previous, closing: true } : previous));
 		const open = (event: MouseEvent) => {
 			if (event.shiftKey) return;
 			event.preventDefault();
@@ -36,7 +45,8 @@ export function AppContextMenu() {
 				y: event.clientY,
 				context: source?.dataset.contextMenu ?? null,
 				linkUrl: source?.dataset.linkUrl ?? null,
-				gliding: previous !== null
+				gliding: previous !== null && !previous.closing,
+				closing: false
 			}));
 		};
 		const closeOnEscape = (event: KeyboardEvent) => {
@@ -52,6 +62,14 @@ export function AppContextMenu() {
 			window.removeEventListener('keydown', closeOnEscape);
 		};
 	}, []);
+
+	// Once the exit animation has had time to play, take the menu out of the page.
+	const closing = menu?.closing ?? false;
+	useEffect(() => {
+		if (!closing) return;
+		const timer = setTimeout(() => setMenu(null), prefersReducedMotion() ? 0 : CLOSE_ANIMATION_MS);
+		return () => clearTimeout(timer);
+	}, [closing]);
 
 	// The menu's size depends on its items (it is taller with "Hide until tomorrow"), so measure it
 	// and pull it back inside the window. This runs before the browser paints, so it never flickers.
@@ -77,7 +95,7 @@ export function AppContextMenu() {
 
 	return (
 		// The unit is written out: Preact does not add "px" to a bare number in a style.
-		<div ref={menuRef} class={cx(styles.appContextMenu, menu.gliding && styles.gliding)} style={`top: ${menu.y}px; left: ${menu.x}px`} role="menu">
+		<div ref={menuRef} class={cx(styles.appContextMenu, menu.gliding && styles.gliding, menu.closing && styles.closing)} style={`top: ${menu.y}px; left: ${menu.x}px`} role="menu">
 			{linkUrl && (
 				<>
 					<a class={styles.appContextMenuItem} role="menuitem" href={linkUrl} target="_blank" rel="noopener noreferrer">
