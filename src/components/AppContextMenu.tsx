@@ -1,7 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { hideQuote } from '@/lib/api/quote';
+import { authenticated } from '@/lib/state/auth';
 import { updateConfig } from '@/lib/state/config';
 import { openSettings } from '@/lib/state/settingsUi';
+import { syncWeather } from '@/lib/state/weather';
 import { isHttpUrl } from '@/lib/utils/url';
 import styles from './AppContextMenu.module.css';
 
@@ -85,6 +87,11 @@ export function AppContextMenu() {
 			{menu.context === 'quote' && (
 				<button class={styles.appContextMenuItem} role="menuitem" onClick={hideQuoteUntilTomorrow}>
 					<i class="bi bi-eye-slash-fill" aria-hidden="true" /> Hide until tomorrow
+				</button>
+			)}
+			{menu.context === 'weather' && authenticated.value && (
+				<button class={styles.appContextMenuItem} role="menuitem" onClick={() => syncWeather()}>
+					<i class="bi bi-arrow-repeat" aria-hidden="true" /> Sync
 				</button>
 			)}
 			<button class={styles.appContextMenuItem} role="menuitem" onClick={openSettings}>

@@ -1,13 +1,10 @@
-import { useEffect, useState } from 'preact/hooks';
-import { fetchWeather } from '@/lib/api/weather';
-import { saveWeatherCache } from '@/lib/api/config';
-import { authenticated } from '@/lib/state/auth';
-import { config, updateConfig } from '@/lib/state/config';
+import { useEffect } from 'preact/hooks';
+import { config } from '@/lib/state/config';
+import { syncWeather, weatherFailed, weatherLoading } from '@/lib/state/weather';
 import { cx } from '@/lib/utils/cx';
 import {
 	formatTimeAgo,
 	isWeatherStale,
-	toWeatherCache,
 	weatherIconClass,
 	windDegreesToCompass
 } from '@/lib/utils/weather';
@@ -25,29 +22,17 @@ function cityClassName(city: string): string {
 	return cx(styles.location, match?.className);
 }
 
-/** Refreshes the cached weather when it's stale, then shares it with the backend. */
+/** Refreshes the cached weather when it's stale. */
 function useWeatherRefresh() {
 	const { weatherEnabled, weatherLat, weatherLng } = config.value;
-	const [loading, setLoading] = useState(false);
-	const [failed, setFailed] = useState(false);
 
 	useEffect(() => {
 		const hasLocation = weatherLat !== 0 || weatherLng !== 0;
 		if (!weatherEnabled || !hasLocation || !isWeatherStale(config.value.lastWeatherUpdate)) return;
-
-		setLoading(true);
-		setFailed(false);
-		fetchWeather(weatherLat, weatherLng)
-			.then((result) => {
-				const cache = toWeatherCache(result);
-				updateConfig({ ...cache, lastWeatherUpdate: new Date().toISOString() });
-				if (authenticated.value) saveWeatherCache(cache).catch(() => {});
-			})
-			.catch(() => setFailed(true))
-			.finally(() => setLoading(false));
+		syncWeather();
 	}, [weatherEnabled, weatherLat, weatherLng]);
 
-	return { loading, failed };
+	return { loading: weatherLoading.value, failed: weatherFailed.value };
 }
 
 export function WeatherWidget() {
@@ -57,7 +42,7 @@ export function WeatherWidget() {
 	if (!cfg.weatherEnabled) return null;
 
 	return (
-		<div class={cx(styles.weatherWidget, styles[`position-${cfg.weatherCorner}`])}>
+		<div class={cx(styles.weatherWidget, styles[`position-${cfg.weatherCorner}`])} data-context-menu="weather">
 			{loading ? (
 				<div class={styles.weatherLoading}>
 					<i class="bi bi-arrow-clockwise spin" aria-hidden="true" />
