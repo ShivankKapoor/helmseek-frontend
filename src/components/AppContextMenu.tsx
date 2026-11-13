@@ -4,6 +4,7 @@ import { authenticated } from '@/lib/state/auth';
 import { updateConfig } from '@/lib/state/config';
 import { openSettings } from '@/lib/state/settingsUi';
 import { syncWeather } from '@/lib/state/weather';
+import { cx } from '@/lib/utils/cx';
 import { isHttpUrl } from '@/lib/utils/url';
 import styles from './AppContextMenu.module.css';
 
@@ -15,6 +16,8 @@ interface MenuState {
 	context: string | null;
 	/** For a quick link, the address it points to (from `data-link-url`). */
 	linkUrl: string | null;
+	/** True when the menu was already open and has moved, so it should glide instead of jump. */
+	gliding: boolean;
 }
 
 /** Replaces the browser's right-click menu. Shift+right-click still opens the native one. */
@@ -28,12 +31,13 @@ export function AppContextMenu() {
 			if (event.shiftKey) return;
 			event.preventDefault();
 			const source = (event.target as HTMLElement).closest<HTMLElement>('[data-context-menu]');
-			setMenu({
+			setMenu((previous) => ({
 				x: event.clientX,
 				y: event.clientY,
 				context: source?.dataset.contextMenu ?? null,
-				linkUrl: source?.dataset.linkUrl ?? null
-			});
+				linkUrl: source?.dataset.linkUrl ?? null,
+				gliding: previous !== null
+			}));
 		};
 		const closeOnEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') close();
@@ -73,7 +77,7 @@ export function AppContextMenu() {
 
 	return (
 		// The unit is written out: Preact does not add "px" to a bare number in a style.
-		<div ref={menuRef} class={styles.appContextMenu} style={`top: ${menu.y}px; left: ${menu.x}px`} role="menu">
+		<div ref={menuRef} class={cx(styles.appContextMenu, menu.gliding && styles.gliding)} style={`top: ${menu.y}px; left: ${menu.x}px`} role="menu">
 			{linkUrl && (
 				<>
 					<a class={styles.appContextMenuItem} role="menuitem" href={linkUrl} target="_blank" rel="noopener noreferrer">

@@ -127,3 +127,35 @@ describe('AppContextMenu weather sync', () => {
 		expect(await screen.findByText('65°F')).toBeInTheDocument();
 	});
 });
+
+describe('AppContextMenu gliding', () => {
+	const menu = () => screen.getByRole('menu');
+
+	it('does not glide when it first opens', () => {
+		renderPage();
+		fireEvent.contextMenu(document.body, { clientX: 10, clientY: 20 });
+
+		expect(menu().className).not.toMatch(/gliding/);
+	});
+
+	it('glides to the new spot when right-clicked again while open', () => {
+		renderPage();
+		fireEvent.contextMenu(document.body, { clientX: 10, clientY: 20 });
+		fireEvent.contextMenu(document.body, { clientX: 100, clientY: 200 });
+
+		expect(menu().className).toMatch(/gliding/);
+		expect(menu().style.top).toBe('200px');
+		expect(menu().style.left).toBe('100px');
+	});
+
+	it('does not glide when reopened after being closed', () => {
+		renderPage();
+		fireEvent.contextMenu(document.body, { clientX: 10, clientY: 20 });
+		fireEvent.contextMenu(document.body, { clientX: 100, clientY: 200 });
+		fireEvent.click(document.body);
+		expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+
+		fireEvent.contextMenu(document.body, { clientX: 50, clientY: 60 });
+		expect(menu().className).not.toMatch(/gliding/);
+	});
+});
