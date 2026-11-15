@@ -1,6 +1,6 @@
 import type { WeatherCache, WeatherResult } from '@/lib/types/weather';
 
-const STALE_AFTER_MS = 30 * 60 * 1000;
+const STALE_AFTER_MS = 15 * 60 * 1000;
 const COMPASS_POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 
 export function toWeatherCache(result: WeatherResult): WeatherCache {

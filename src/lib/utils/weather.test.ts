@@ -42,10 +42,10 @@ describe('isWeatherStale', () => {
 		expect(isWeatherStale(null)).toBe(true);
 	});
 
-	it('is fresh within 30 minutes and stale after', () => {
-		expect(isWeatherStale(minutesAgo(29))).toBe(false);
-		expect(isWeatherStale(minutesAgo(30))).toBe(false);
-		expect(isWeatherStale(minutesAgo(31))).toBe(true);
+	it('is fresh within 15 minutes and stale after', () => {
+		expect(isWeatherStale(minutesAgo(14))).toBe(false);
+		expect(isWeatherStale(minutesAgo(15))).toBe(false);
+		expect(isWeatherStale(minutesAgo(16))).toBe(true);
 	});
 });
 
