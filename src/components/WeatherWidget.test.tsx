@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/preact';
 import { saveWeatherCache } from '@/lib/api/config';
 import { fetchWeather } from '@/lib/api/weather';
-import { setAuthenticated } from '@/lib/state/auth';
-import { config } from '@/lib/state/config';
+import { setAuthenticated, setUnauthenticated } from '@/lib/state/auth';
+import { config, replaceConfig } from '@/lib/state/config';
 import type { UserConfig } from '@/lib/types/config';
 import { resetAppState, setConfig } from '@/test/helpers';
 import { WeatherWidget } from './WeatherWidget';
@@ -73,6 +73,7 @@ describe('WeatherWidget', () => {
 	});
 
 	it('refreshes a stale reading and stores it locally', async () => {
+		setUnauthenticated();
 		setConfig(withCachedReading(STALE));
 		render(<WeatherWidget />);
 
@@ -83,6 +84,7 @@ describe('WeatherWidget', () => {
 	});
 
 	it('shares a refreshed reading with the backend only when signed in', async () => {
+		setUnauthenticated();
 		setConfig(withCachedReading(STALE));
 		const signedOut = render(<WeatherWidget />);
 		await screen.findByText('65°F');
@@ -100,9 +102,31 @@ describe('WeatherWidget', () => {
 
 	it('shows an error when the refresh fails', async () => {
 		vi.mocked(fetchWeather).mockRejectedValue(new Error('rate limited'));
+		setUnauthenticated();
 		setConfig(withCachedReading(STALE));
 		render(<WeatherWidget />);
 
 		expect(await screen.findByText('Weather unavailable')).toBeInTheDocument();
+	});
+
+	it('waits for the session check so a signed-in refresh reaches the backend', async () => {
+		setConfig(withCachedReading(STALE));
+		render(<WeatherWidget />);
+		expect(fetchWeather).not.toHaveBeenCalled();
+
+		setAuthenticated('test');
+		await waitFor(() => expect(saveWeatherCache).toHaveBeenCalledTimes(1));
+		expect(fetchWeather).toHaveBeenCalledTimes(1);
+	});
+
+	it('refreshes when the server replaces a fresh local reading with a stale one', async () => {
+		setAuthenticated('test');
+		setConfig(withCachedReading(FRESH()));
+		render(<WeatherWidget />);
+		expect(fetchWeather).not.toHaveBeenCalled();
+
+		replaceConfig({ ...config.value, ...withCachedReading(STALE) });
+		expect(await screen.findByText('65°F')).toBeInTheDocument();
+		expect(fetchWeather).toHaveBeenCalledTimes(1);
 	});
 });

@@ -1,4 +1,5 @@
 import { useEffect } from 'preact/hooks';
+import { checking } from '@/lib/state/auth';
 import { config } from '@/lib/state/config';
 import { syncWeather, weatherFailed, weatherLoading } from '@/lib/state/weather';
 import { cx } from '@/lib/utils/cx';
@@ -22,15 +23,22 @@ function cityClassName(city: string): string {
 	return cx(styles.location, match?.className);
 }
 
-/** Refreshes the cached weather when it's stale. */
+/**
+ * Refreshes the cached weather when it's stale.
+ *
+ * Waits for the startup session check: syncing before it finishes would skip saving to the backend,
+ * and the server's older copy would then replace the fresh weather. Re-runs when lastWeatherUpdate
+ * changes so a stale copy loaded from the server is refreshed too.
+ */
 function useWeatherRefresh() {
-	const { weatherEnabled, weatherLat, weatherLng } = config.value;
+	const { weatherEnabled, weatherLat, weatherLng, lastWeatherUpdate } = config.value;
+	const sessionChecking = checking.value;
 
 	useEffect(() => {
 		const hasLocation = weatherLat !== 0 || weatherLng !== 0;
-		if (!weatherEnabled || !hasLocation || !isWeatherStale(config.value.lastWeatherUpdate)) return;
+		if (sessionChecking || !weatherEnabled || !hasLocation || !isWeatherStale(lastWeatherUpdate)) return;
 		syncWeather();
-	}, [weatherEnabled, weatherLat, weatherLng]);
+	}, [sessionChecking, weatherEnabled, weatherLat, weatherLng, lastWeatherUpdate]);
 
 	return { loading: weatherLoading.value, failed: weatherFailed.value };
 }
