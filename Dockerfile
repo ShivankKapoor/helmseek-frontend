@@ -13,7 +13,7 @@ COPY . .
 RUN npm run build
 
 # ─── Stage 2: Serve ───────────────────────────────────────────────────────────
-FROM nginx:1.31-alpine AS runner
+FROM nginx:1.30-alpine AS runner
 
 COPY --from=builder /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
